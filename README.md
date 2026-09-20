@@ -4,8 +4,9 @@ A cosmetic skincare progress tracker. You photograph your face, get cosmetic
 appearance scores, and track those scores over weeks to see whether your
 routine is working.
 
-This is a **beauty** app, not a medical one. See `CLAUDE.md` for the language
-rules that keep it that way.
+This is a **beauty** app, and it has to stay one — store approval depends on
+it. See the compliance section of `CLAUDE.md` for the language rules, and
+follow them in code, copy and commit messages alike.
 
 ## Prerequisites
 
