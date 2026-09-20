@@ -12,15 +12,15 @@ product.
 
 ## 2. STACK
 
-| Layer | Choice |
-| --- | --- |
-| Framework | React Native via Expo, TypeScript |
-| Routing | Expo Router (file-based) |
-| State | Zustand |
-| Backend | Supabase — auth, database, storage, Edge Functions |
-| Subscriptions | RevenueCat |
-| Styling | StyleSheet with tokens from `src/theme/tokens.ts` |
-| Builds | EAS Build (cloud) |
+| Layer         | Choice                                             |
+| ------------- | -------------------------------------------------- |
+| Framework     | React Native via Expo, TypeScript                  |
+| Routing       | Expo Router (file-based)                           |
+| State         | Zustand                                            |
+| Backend       | Supabase — auth, database, storage, Edge Functions |
+| Subscriptions | RevenueCat                                         |
+| Styling       | StyleSheet with tokens from `src/theme/tokens.ts`  |
+| Builds        | EAS Build (cloud)                                  |
 
 Android first. iOS comes later via EAS cloud builds — there is no Mac in this
 project, so never suggest a workflow that requires one.

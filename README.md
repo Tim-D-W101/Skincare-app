@@ -10,10 +10,10 @@ follow them in code, copy and commit messages alike.
 
 ## Prerequisites
 
-| Tool | Notes |
-| --- | --- |
-| Node.js | LTS (the major version in `.nvmrc`). Check with `node -v` |
-| Git | Check with `git --version` |
+| Tool    | Notes                                                      |
+| ------- | ---------------------------------------------------------- |
+| Node.js | LTS (the major version in `.nvmrc`). Check with `node -v`  |
+| Git     | Check with `git --version`                                 |
 | Expo Go | Installed on a physical Android phone, from the Play Store |
 
 Your phone and your computer must be on the same Wi-Fi network. On Windows,
