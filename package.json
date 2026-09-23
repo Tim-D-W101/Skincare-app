@@ -35,7 +35,8 @@
     "web": "expo start --web",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "types:db": "npx supabase gen types typescript --project-id yheevhjamvuxtnqudszk --schema public > src/types/database.ts"
   },
   "private": true
 }

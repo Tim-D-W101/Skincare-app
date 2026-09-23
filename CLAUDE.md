@@ -10,6 +10,11 @@ within seconds. Those scores are tracked over weeks so the user can see whether
 their routine is working — the scan is the hook, the progress graph is the
 product.
 
+Planning documents — the phase roadmap, specs, briefs — live in
+`docs/reference/`, committed to the repository. Read what is there before
+starting work. A document attached to a chat does not survive into the next
+session; only a committed file does.
+
 ## 2. STACK
 
 | Layer         | Choice                                             |
