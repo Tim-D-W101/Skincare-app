@@ -102,6 +102,14 @@ export function useColors(): ColorPalette {
   return scheme === 'dark' ? colors.dark : colors.light;
 }
 
+/** Maps a 0-100 score onto the five-step score scale in equal bands. */
+export function getScoreColor(score: number, palette: ColorPalette): string {
+  const steps = palette.score.length;
+  const clamped = Math.min(100, Math.max(0, score));
+  const index = Math.min(steps - 1, Math.floor(clamped / (100 / steps)));
+  return palette.score[index];
+}
+
 // ---------------------------------------------------------------------------
 // Spacing and radius
 // ---------------------------------------------------------------------------
@@ -121,6 +129,31 @@ export const radius = {
   md: 12,
   lg: 20,
   full: 999,
+} as const;
+
+// ---------------------------------------------------------------------------
+// Component sizing and opacity
+// ---------------------------------------------------------------------------
+
+export const sizes = {
+  /** Minimum touch target for anything tappable. Smaller controls get hitSlop to reach it. */
+  minTouchTarget: 44,
+  control: { sm: 36, md: 44, lg: 52 },
+  chip: 36,
+  icon: { sm: 16, md: 20, lg: 24, xl: 40 },
+  iconStroke: 1.75,
+  borderWidth: 1,
+  scoreRing: { sm: 64, md: 120, lg: 180 },
+  scoreRingStroke: { sm: 6, md: 10, lg: 14 },
+  skeletonLine: 14,
+  /** Width of the last skeleton line, so the block reads as a paragraph. */
+  skeletonShortLine: '60%',
+} as const;
+
+export const opacity = {
+  disabled: 0.4,
+  skeletonLow: 0.4,
+  skeletonHigh: 1,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -213,7 +246,13 @@ export const motion = {
     fast: 150,
     base: 250,
     slow: 400,
+    /** The score ring sweep and count-up. */
+    reveal: 900,
+    /** One half-cycle of the skeleton pulse. */
+    pulse: 800,
   },
+  /** Scale applied to a button while pressed. */
+  pressScale: 0.97,
   easing: {
     /** Most on-screen movement: quick start, gentle settle. */
     standard: [0.2, 0, 0, 1],
