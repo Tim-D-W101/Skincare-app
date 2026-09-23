@@ -5,3 +5,4 @@ build/
 android/
 ios/
 package-lock.json
+src/types/database.ts

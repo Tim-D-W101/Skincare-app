@@ -56,6 +56,19 @@ npx expo-doctor     # project health
 
 CI runs `typecheck` and `lint` on every push and pull request to `main`.
 
+## Database types
+
+`src/types/database.ts` is generated from the live Supabase schema. **Re-run
+this after every migration**, or the app's types drift from the database:
+
+```bash
+npx supabase login     # once per machine
+npm run types:db
+```
+
+`types:db` runs the Supabase CLI through `npx`, so it is not a project
+dependency. Never edit `database.ts` by hand.
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.
