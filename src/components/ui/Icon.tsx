@@ -3,21 +3,33 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { sizes, useColors, type ColorName } from '@/theme/tokens';
 
 export type IconName =
-  'info' | 'alert' | 'sparkle' | 'refresh' | 'check' | 'plus' | 'back' | 'home' | 'settings';
+  | 'info'
+  | 'alert'
+  | 'sparkle'
+  | 'refresh'
+  | 'check'
+  | 'plus'
+  | 'back'
+  | 'home'
+  | 'settings'
+  | 'close'
+  | 'flip';
 
 export interface IconProps {
   name: IconName;
   size?: number;
   color?: ColorName;
+  /** A raw colour that overrides `color`, for icons over a camera feed where theme colours don't apply. */
+  tint?: string;
 }
 
 /**
  * A small set of line icons drawn on a 24-unit grid. Icons are decorative and
  * hidden from screen readers; the text beside them carries the meaning.
  */
-export function Icon({ name, size = sizes.icon.md, color = 'textSecondary' }: IconProps) {
+export function Icon({ name, size = sizes.icon.md, color = 'textSecondary', tint }: IconProps) {
   const palette = useColors();
-  const stroke = palette[color];
+  const stroke = tint ?? palette[color];
 
   return (
     <Svg
@@ -84,6 +96,17 @@ function renderGlyph(name: IconName) {
           <Path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
           <Circle cx={15} cy={7} r={2} />
           <Circle cx={9} cy={17} r={2} />
+        </>
+      );
+    case 'close':
+      return <Path d="M6 6l12 12M18 6L6 18" />;
+    case 'flip':
+      return (
+        <>
+          <Path d="M4 9a8 8 0 0 1 14-3.5L20 8" />
+          <Path d="M20 4v4h-4" />
+          <Path d="M20 15a8 8 0 0 1-14 3.5L4 16" />
+          <Path d="M4 20v-4h4" />
         </>
       );
   }

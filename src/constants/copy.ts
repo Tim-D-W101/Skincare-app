@@ -189,6 +189,7 @@ export const copy = {
       openSettings: 'Open settings',
     },
     guidance: {
+      checking: 'Checking the light',
       tooDark: 'Move to brighter light',
       tooBright: 'Move out of direct light',
       holdSteady: 'Hold steady',
@@ -205,6 +206,9 @@ export const copy = {
       ghostTooltip:
         'Line your face up with your last photo. Matching the position makes your before and after far easier to compare.',
       why: 'Why?',
+      processing: 'Saving your photo',
+      failed: "That photo didn't work. Try again.",
+      cameraError: "The camera couldn't start. Close any other app using it, then try again.",
     },
     tips: {
       title: 'Getting comparable photos',
@@ -220,6 +224,9 @@ export const copy = {
       title: 'Use this photo?',
       use: 'Use this',
       retake: 'Retake',
+      /** Development only: checks the photo is the size the upload expects. */
+      devSize: (width: number, height: number, kilobytes: number | null) =>
+        `${width}x${height}px${kilobytes === null ? '' : `, ${kilobytes} KB`}`,
     },
     analysing: {
       title: 'Looking at your photo',

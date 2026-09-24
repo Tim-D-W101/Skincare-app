@@ -48,6 +48,7 @@ export default function RootLayout() {
         </Stack.Protected>
         <Stack.Protected guard={onboarded}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="scan" options={{ animation: 'slide_from_bottom' }} />
         </Stack.Protected>
         <Stack.Screen name="(auth)" />
       </Stack>

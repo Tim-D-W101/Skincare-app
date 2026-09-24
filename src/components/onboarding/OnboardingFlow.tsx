@@ -113,9 +113,13 @@ function OnboardingPager({ profile }: OnboardingPagerProps) {
       }
     }
 
-    // Finishing the last step flips the root layout's guard, which replaces
-    // onboarding with the tabs, so there is nowhere further to slide to.
-    if (step !== 'ready') goTo(stepIndex + 1);
+    if (step !== 'ready') {
+      goTo(stepIndex + 1);
+      return;
+    }
+    // Finishing flips the root layout's guard, which swaps onboarding for the
+    // tabs; the camera then opens on top of them.
+    router.push('/scan/capture');
   };
 
   const answer = (changes: Partial<OnboardingAnswers>) => {

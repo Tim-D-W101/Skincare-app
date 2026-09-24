@@ -6,14 +6,21 @@ import { copy } from '@/constants/copy';
 import { spacing } from '@/theme/tokens';
 
 /**
- * Home. A placeholder until the scan flow exists: it is where a finished
- * onboarding lands. In development it also links to the component gallery.
+ * Home. A placeholder until scan results and progress exist: for now it offers
+ * a scan. In development it also links to the component gallery.
  */
 export default function Home() {
   return (
     <Screen edges={['top', 'right', 'left']} contentStyle={styles.content}>
       <View style={styles.main}>
-        <EmptyState title={copy.progress.noScans.title} body={copy.progress.noScans.body} />
+        <EmptyState
+          title={copy.progress.noScans.title}
+          body={copy.progress.noScans.body}
+          action={{
+            label: copy.progress.noScans.cta,
+            onPress: () => router.push('/scan/capture'),
+          }}
+        />
       </View>
       {__DEV__ ? (
         <Button

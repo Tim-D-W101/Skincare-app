@@ -96,6 +96,22 @@ export const colors: Record<ColorSchemeName, ColorPalette> = {
   dark: darkColors,
 };
 
+/**
+ * Colours for screens drawn over a live camera feed. The feed looks the same
+ * in light and dark mode, so these don't switch with the system setting.
+ */
+export const cameraColors = {
+  background: '#000000',
+  /** Dims everything outside the face oval. */
+  scrim: 'rgba(13, 16, 15, 0.6)',
+  /** Behind buttons and the guidance line. */
+  control: 'rgba(13, 16, 15, 0.55)',
+  text: '#FFFFFF',
+  ovalIdle: 'rgba(255, 255, 255, 0.75)',
+  ovalReady: '#70BFB4',
+  shutter: '#FFFFFF',
+} as const;
+
 /** Returns the palette for the device's current light/dark setting. */
 export function useColors(): ColorPalette {
   const scheme = useColorScheme();
@@ -154,8 +170,25 @@ export const sizes = {
 
 export const opacity = {
   disabled: 0.4,
+  pressed: 0.7,
   skeletonLow: 0.4,
   skeletonHigh: 1,
+} as const;
+
+/** Layout of the capture screen. Oval values are fractions of the preview size. */
+export const camera = {
+  ovalWidth: 0.72,
+  /** Oval height divided by its width. */
+  ovalAspect: 1.32,
+  /** Cap on the oval's height, for short screens. */
+  ovalMaxHeight: 0.6,
+  /** Vertical centre of the oval: a little above the middle, clear of the controls. */
+  ovalCenterY: 0.42,
+  ovalStroke: 3,
+  shutter: 76,
+  shutterRing: 4,
+  /** Opacity of the previous scan photo shown over the preview. */
+  ghostOpacity: 0.2,
 } as const;
 
 // ---------------------------------------------------------------------------
