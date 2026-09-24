@@ -203,6 +203,7 @@ export const copy = {
       flipCamera: 'Switch camera',
       ghostOn: 'Show last photo',
       ghostOff: 'Hide last photo',
+      ghostUnavailable: "Last photo didn't load",
       ghostTooltip:
         'Line your face up with your last photo. Matching the position makes your before and after far easier to compare.',
       why: 'Why?',

@@ -1,15 +1,16 @@
 import { CameraView } from 'expo-camera';
 import { router, useIsFocused } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ErrorState, Screen } from '@/components/ui';
+import { Button, Card, ErrorState, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { captureQuality, choosePictureSize, pickGuidance, processPhoto } from '@/lib/capture';
 import { logInDevelopment } from '@/lib/errors';
 import { hapticImpact } from '@/lib/haptics';
+import { hasSeenGhostTooltip, markGhostTooltipSeen } from '@/lib/preferences';
 import { useScanStore } from '@/stores/useScanStore';
 import { cameraColors, spacing } from '@/theme/tokens';
 import type { CameraFacing } from '@/types/scan';
@@ -17,6 +18,7 @@ import type { CameraFacing } from '@/types/scan';
 import { CameraMessage, ControlButton, ControlPill, ShutterButton } from './CameraControls';
 import { CameraPermissionGate } from './CameraPermissionGate';
 import { FaceOval } from './FaceOval';
+import { GhostOverlay } from './GhostOverlay';
 import { TipsSheet } from './TipsSheet';
 import { useAppActive, useLightMeter, useSteadiness } from './useCaptureChecks';
 
@@ -44,6 +46,8 @@ function CaptureView() {
   const isFocused = useIsFocused();
   const appActive = useAppActive();
   const setCapture = useScanStore((state) => state.setCapture);
+  const ghost = useScanStore((state) => state.ghost);
+  const loadGhost = useScanStore((state) => state.loadGhost);
 
   const [view, setView] = useState({ width: 0, height: 0 });
   const [facing, setFacing] = useState<CameraFacing>('front');
@@ -54,6 +58,9 @@ function CaptureView() {
   const [capturing, setCapturing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tipsOpen, setTipsOpen] = useState(false);
+  // On by default whenever there is a previous photo to line up with.
+  const [ghostShown, setGhostShown] = useState(true);
+  const [ghostTooltipOpen, setGhostTooltipOpen] = useState(false);
 
   // The camera only runs while this screen is visible and the app is open.
   const active = isFocused && appActive;
@@ -66,6 +73,36 @@ function CaptureView() {
   const steadiness = useSteadiness(active);
   const guidance = pickGuidance(meter.level, steadiness.steady);
   const canCapture = cameraReady && guidance === 'good';
+  const ghostUrl = ghost.status === 'ready' ? ghost.url : null;
+
+  useEffect(() => {
+    void loadGhost();
+  }, [loadGhost]);
+
+  // The first time a previous photo appears, explain what it's for.
+  useEffect(() => {
+    if (!ghostUrl) return;
+    let current = true;
+    hasSeenGhostTooltip()
+      .then((seen) => {
+        if (current && !seen) setGhostTooltipOpen(true);
+      })
+      .catch((tooltipError: unknown) => {
+        logInDevelopment('Could not read the ghost tooltip flag', tooltipError);
+        if (current) setGhostTooltipOpen(true);
+      });
+    return () => {
+      current = false;
+    };
+  }, [ghostUrl]);
+
+  const dismissGhostTooltip = () => {
+    setGhostTooltipOpen(false);
+    markGhostTooltipSeen().catch((tooltipError: unknown) => {
+      // Worst case the tip shows once more next time.
+      logInDevelopment('Could not save the ghost tooltip flag', tooltipError);
+    });
+  };
 
   const handleLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -148,6 +185,10 @@ function CaptureView() {
         }}
       />
 
+      {ghostUrl && ghostShown ? (
+        <GhostOverlay url={ghostUrl} mirrored={facing === 'front'} />
+      ) : null}
+
       {view.width > 0 ? (
         <FaceOval width={view.width} height={view.height} ready={canCapture} />
       ) : null}
@@ -159,14 +200,43 @@ function CaptureView() {
           { paddingTop: insets.top + spacing.sm, paddingBottom: insets.bottom + spacing.lg },
         ]}
       >
-        <View style={styles.topBar}>
-          <ControlButton icon="close" label={copy.common.close} onPress={leave} />
-          <ControlButton
-            icon="flip"
-            label={copy.scan.capture.flipCamera}
-            onPress={flip}
-            disabled={capturing}
-          />
+        <View style={styles.top}>
+          <View style={styles.topBar}>
+            <ControlButton icon="close" label={copy.common.close} onPress={leave} />
+            {ghostUrl ? (
+              <ControlPill
+                label={ghostShown ? copy.scan.capture.ghostOff : copy.scan.capture.ghostOn}
+                onPress={() => setGhostShown((shown) => !shown)}
+              />
+            ) : null}
+            {ghost.status === 'failed' ? (
+              <ControlPill
+                label={copy.scan.capture.ghostUnavailable}
+                onPress={() => void loadGhost()}
+                accessibilityHint={copy.common.retry}
+              />
+            ) : null}
+            <ControlButton
+              icon="flip"
+              label={copy.scan.capture.flipCamera}
+              onPress={flip}
+              disabled={capturing}
+            />
+          </View>
+
+          {ghostTooltipOpen && ghostShown ? (
+            <Card style={styles.tooltip}>
+              <Text variant="bodySmall" accessibilityLiveRegion="polite">
+                {copy.scan.capture.ghostTooltip}
+              </Text>
+              <Button
+                label={copy.common.done}
+                onPress={dismissGhostTooltip}
+                variant="ghost"
+                size="sm"
+              />
+            </Card>
+          ) : null}
         </View>
 
         <View style={styles.bottom}>
@@ -204,9 +274,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     pointerEvents: 'box-none',
   },
+  top: {
+    gap: spacing.md,
+  },
   topBar: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  tooltip: {
+    gap: spacing.sm,
+    alignItems: 'flex-start',
   },
   bottom: {
     gap: spacing.md,
