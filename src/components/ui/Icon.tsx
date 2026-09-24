@@ -2,7 +2,8 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { sizes, useColors, type ColorName } from '@/theme/tokens';
 
-export type IconName = 'info' | 'alert' | 'sparkle' | 'refresh' | 'check' | 'plus';
+export type IconName =
+  'info' | 'alert' | 'sparkle' | 'refresh' | 'check' | 'plus' | 'back' | 'home' | 'settings';
 
 export interface IconProps {
   name: IconName;
@@ -67,5 +68,23 @@ function renderGlyph(name: IconName) {
       return <Path d="M5 12.5l4.5 4.5L19 7.5" />;
     case 'plus':
       return <Path d="M12 5v14M5 12h14" />;
+    case 'back':
+      return <Path d="M15 5l-7 7 7 7" />;
+    case 'home':
+      return (
+        <>
+          <Path d="M4 11l8-7 8 7" />
+          <Path d="M6 9.5V20h12V9.5" />
+          <Path d="M10 20v-5h4v5" />
+        </>
+      );
+    case 'settings':
+      return (
+        <>
+          <Path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+          <Circle cx={15} cy={7} r={2} />
+          <Circle cx={9} cy={17} r={2} />
+        </>
+      );
   }
 }

@@ -40,7 +40,9 @@ export const copy = {
       body: 'Take a photo each week and watch how your skin looks change over time.',
       note: 'GlowTrack gives cosmetic estimates, not professional skincare advice.',
       start: 'Get started',
+      signIn: 'I already have an account',
     },
+    progress: 'Setup progress',
     ageBand: {
       title: 'How old are you?',
       body: 'Skin looks different at different ages, so this helps set your baseline.',
@@ -81,11 +83,11 @@ export const copy = {
       limitReached: (max: number) => `You can pick up to ${max}.`,
       options: {
         blemishes: 'Visible blemishes',
-        unevenTone: 'Uneven tone',
+        uneven_tone: 'Uneven tone',
         pores: 'Visible pores',
         dryness: 'Dryness',
         dullness: 'Dullness',
-        fineLines: 'Fine lines',
+        fine_lines: 'Fine lines',
         redness: 'Redness',
         oiliness: 'Oiliness',
       },
@@ -96,7 +98,7 @@ export const copy = {
       options: {
         clearer: 'Clearer-looking skin',
         smoother: 'Smoother texture',
-        evenTone: 'A more even tone',
+        even_tone: 'A more even tone',
         glow: 'More glow',
         hydrated: 'Skin that looks more hydrated',
         consistency: 'A routine I actually stick to',
@@ -105,9 +107,25 @@ export const copy = {
     ready: {
       title: "You're all set",
       summary: (skinType: string, goal: string) =>
-        `Your skin is ${skinType.toLowerCase()} and you're focusing on ${goal.toLowerCase()}. Your first scan sets the baseline.`,
+        `You have ${skinType} skin and you're focusing on ${goal}. Your first scan sets the baseline.`,
       summaryUnsure: (goal: string) =>
-        `You're focusing on ${goal.toLowerCase()}. Your first scan sets the baseline, and helps work out your skin type too.`,
+        `You're focusing on ${goal}. Your first scan sets the baseline.`,
+      /** Mid-sentence wording for the summary, so labels never need re-casing. */
+      skinTypes: {
+        oily: 'oily',
+        dry: 'dry',
+        combination: 'combination',
+        normal: 'normal',
+        sensitive: 'sensitive',
+      },
+      goals: {
+        clearer: 'clearer-looking skin',
+        smoother: 'smoother texture',
+        even_tone: 'a more even tone',
+        glow: 'more glow',
+        hydrated: 'skin that looks more hydrated',
+        consistency: 'a routine you actually stick to',
+      },
       cta: 'Take my first scan',
     },
     saveError: "We couldn't save that answer. Check your connection and try again.",
@@ -137,6 +155,15 @@ export const copy = {
       body: 'Add your email so your scans and history stay with you if you change phones.',
       cta: 'Save my progress',
       saved: 'Your progress is saved to your email.',
+      emailInUse:
+        'That email already has a GlowTrack account. Sign in with it to pick up where you left off.',
+      signInInstead: 'Sign in instead',
+    },
+    callback: {
+      working: 'Signing you in',
+      failed:
+        'That link has expired or has already been used. Request a new one and open it on this phone.',
+      requestNew: 'Request a new link',
     },
     signOut: 'Sign out',
   },
@@ -394,6 +421,11 @@ export const copy = {
       'Your subscription has ended. Your history is still here, and you can subscribe again to keep scanning.',
   },
 
+  tabs: {
+    home: 'Home',
+    settings: 'Settings',
+  },
+
   settings: {
     title: 'Settings',
     account: {
@@ -455,6 +487,7 @@ export const copy = {
     offline: "You're offline. Check your connection and try again.",
     timeout: 'This is taking too long. Check your connection and try again.',
     sessionExpired: 'You were signed out. Sign in again to continue.',
+    rateLimited: 'Too many tries in a row. Wait a minute, then try again.',
     /** Codes returned by the analyze-scan Edge Function. */
     scan: {
       UNAUTHORIZED: 'You were signed out. Sign in again to continue.',
@@ -494,6 +527,7 @@ export const copy = {
       loadingState: 'Loading state',
       errorState: 'Error state',
       disclaimer: 'Disclaimer',
+      textField: 'Text field',
     },
     textSample: 'Your routine, week by week.',
     buttons: {
@@ -514,6 +548,9 @@ export const copy = {
     emptyTitle: 'No scans yet',
     emptyBody: 'Your first scan sets the baseline everything else is compared with.',
     emptyAction: 'Take a scan',
+    textFieldLabel: 'Email address',
+    textFieldPlaceholder: 'you@example.com',
+    textFieldError: "That doesn't look like an email address.",
   },
 } as const;
 

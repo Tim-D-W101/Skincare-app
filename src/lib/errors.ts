@@ -19,6 +19,8 @@ import { copy } from '@/constants/copy';
 
 export type ScanErrorCode = keyof typeof copy.errors.scan;
 
+const AUTH_RATE_LIMIT_CODES = new Set(['over_email_send_rate_limit', 'over_request_rate_limit']);
+
 const AUTH_EXPIRED_CODES = new Set([
   'session_expired',
   'session_not_found',
@@ -67,6 +69,13 @@ export function toUserMessage(error: unknown): string {
   if (isAuthError(error)) {
     if (isAuthSessionMissingError(error)) return copy.errors.sessionExpired;
     if (isAuthRetryableFetchError(error)) return copy.errors.offline;
+    if (
+      error.status === 429 ||
+      (error.code !== undefined && AUTH_RATE_LIMIT_CODES.has(error.code))
+    ) {
+      return copy.errors.rateLimited;
+    }
+    if (error.code === 'email_address_invalid') return copy.auth.signIn.invalidEmail;
     if (error.code !== undefined && AUTH_EXPIRED_CODES.has(error.code)) {
       return copy.errors.sessionExpired;
     }
@@ -89,7 +98,7 @@ function isTimeoutError(error: unknown): boolean {
   return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
 }
 
-function logInDevelopment(context: string, error: unknown): void {
+export function logInDevelopment(context: string, error: unknown): void {
   if (__DEV__) {
     console.warn(`[errors] ${context}:`, error);
   }

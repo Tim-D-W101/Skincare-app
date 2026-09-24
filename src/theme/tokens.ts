@@ -146,6 +146,8 @@ export const sizes = {
   scoreRing: { sm: 64, md: 120, lg: 180 },
   scoreRingStroke: { sm: 6, md: 10, lg: 14 },
   skeletonLine: 14,
+  /** Height of one segment of the onboarding progress bar. */
+  progressSegment: 4,
   /** Width of the last skeleton line, so the block reads as a paragraph. */
   skeletonShortLine: '60%',
 } as const;
@@ -253,6 +255,16 @@ export const motion = {
   },
   /** Scale applied to a button while pressed. */
   pressScale: 0.97,
+  /**
+   * Horizontal swipe between steps. A drag becomes a swipe once it travels
+   * `activation` dp mostly sideways; it counts on release past `distance` dp
+   * or faster than `velocity` dp/ms.
+   */
+  swipe: {
+    activation: 12,
+    distance: 60,
+    velocity: 0.35,
+  },
   easing: {
     /** Most on-screen movement: quick start, gentle settle. */
     standard: [0.2, 0, 0, 1],
