@@ -69,6 +69,22 @@ npm run types:db
 `types:db` runs the Supabase CLI through `npx`, so it is not a project
 dependency. Never edit `database.ts` by hand.
 
+## Auth settings
+
+Every new install is signed in anonymously, and email sign-in uses emailed
+links. The app can't start until these are set in the Supabase dashboard:
+
+1. **Authentication → Sign In / Providers:** turn on **Allow anonymous
+   sign-ins**, and **Allow manual linking**, which Supabase requires for
+   turning an anonymous user into one with an email.
+2. **Authentication → URL Configuration → Redirect URLs:** add
+   `glowtrack://**` (installed builds) and `exp://**` (Expo Go). Email links
+   only return to the app if their redirect is on this list.
+
+Anonymous sign-ins are limited to 30 per hour per IP address by default
+(**Authentication → Rate Limits**). Repeated reinstalls while testing can hit
+that limit.
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.
