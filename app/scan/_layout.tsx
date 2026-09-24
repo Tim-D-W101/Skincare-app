@@ -11,6 +11,12 @@ export default function ScanLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: palette.background },
       }}
-    />
+    >
+      <Stack.Screen name="capture" />
+      <Stack.Screen name="confirm" />
+      {/* Leaving these goes home, handled by the screens themselves, not a swipe back. */}
+      <Stack.Screen name="analysing" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="result" options={{ gestureEnabled: false }} />
+    </Stack>
   );
 }

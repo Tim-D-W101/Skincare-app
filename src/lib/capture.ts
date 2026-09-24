@@ -10,6 +10,7 @@ import {
   PHOTO_LONG_EDGE,
 } from '@/constants/capture';
 import { meanLuminanceFromJpeg } from '@/lib/jpegLuminance';
+import { deleteLocalFile } from '@/lib/photos';
 import { camera } from '@/theme/tokens';
 import type { CameraFacing, CaptureQuality } from '@/types/scan';
 
@@ -114,11 +115,14 @@ export async function sampleFaceLuminance(
   try {
     const crop = faceCrop({ width: picture.width, height: picture.height }, view, faceOval(view));
     image = await context.crop(crop).resize({ width: 8, height: 8 }).renderAsync();
-    const { base64 } = await image.saveAsync({
+    const { base64, uri } = await image.saveAsync({
       base64: true,
       compress: 1,
       format: SaveFormat.JPEG,
     });
+    // Saving always writes a file too. Only the base64 is needed, and samples
+    // run a few times a second, so don't let them pile up in the cache.
+    deleteLocalFile(uri);
     return base64 ? meanLuminanceFromJpeg(base64) : null;
   } finally {
     image?.release();

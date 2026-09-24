@@ -1,3 +1,6 @@
+import type { copy } from '@/constants/copy';
+import type { ATTRIBUTE_KEYS } from '@/constants/scan';
+
 export type CameraFacing = 'front' | 'back';
 
 /**
@@ -18,4 +21,24 @@ export interface CapturedPhoto {
   width: number;
   height: number;
   quality: CaptureQuality;
+}
+
+/** A scans row's status. The Edge Function moves it on from 'pending'. */
+export type ScanStatus = 'pending' | 'processing' | 'complete' | 'failed' | 'rejected';
+
+export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number];
+
+/** Why a photo couldn't be scored. Each has a message in copy.scan.rejected.reasons. */
+export type RejectReason = keyof typeof copy.scan.rejected.reasons;
+
+/** The scores and text for one completed scan. */
+export interface ScanResult {
+  scanId: string;
+  createdAt: string;
+  overall: number;
+  scores: Record<AttributeKey, number>;
+  headline: string;
+  observations: string[];
+  focusAreas: AttributeKey[];
+  referToProfessional: boolean;
 }

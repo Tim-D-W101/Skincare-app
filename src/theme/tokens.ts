@@ -191,6 +191,18 @@ export const camera = {
   ghostOpacity: 0.2,
 } as const;
 
+/**
+ * The scanning sweep over the photo while a scan is analysed. A fixed colour:
+ * it sits on a photo, which looks the same in light and dark mode.
+ */
+export const scanSweep = {
+  color: '#70BFB4',
+  /** Height of the moving band, as a fraction of the photo's height. */
+  band: 0.35,
+  /** Opacity at the band's centre. It fades to nothing at both edges. */
+  peakOpacity: 0.35,
+} as const;
+
 // ---------------------------------------------------------------------------
 // Typography
 // ---------------------------------------------------------------------------
@@ -285,6 +297,8 @@ export const motion = {
     reveal: 900,
     /** One half-cycle of the skeleton pulse. */
     pulse: 800,
+    /** One pass of the scanning sweep over the photo. */
+    sweep: 2400,
   },
   /** Scale applied to a button while pressed. */
   pressScale: 0.97,

@@ -11,8 +11,10 @@ import { spacing } from '@/theme/tokens';
 
 /** Shows the photo before anything is sent. "Use this" is the only way forward. */
 export function CaptureConfirm() {
-  const capture = useScanStore((state) => state.capture);
-  const confirmCapture = useScanStore((state) => state.confirmCapture);
+  // The photo as it was on arrival. Retake clears the store's copy, and this
+  // screen keeps showing its own while it animates away.
+  const [capture] = useState(() => useScanStore.getState().capture);
+  const submitCapture = useScanStore((state) => state.submitCapture);
   const discardCapture = useScanStore((state) => state.discardCapture);
   const [kilobytes, setKilobytes] = useState<number | null>(null);
 
@@ -39,8 +41,9 @@ export function CaptureConfirm() {
   };
 
   const use = () => {
-    confirmCapture();
-    router.dismissTo('/');
+    // Progress and errors show on the waiting screen, so this isn't awaited.
+    void submitCapture();
+    router.replace('/scan/analysing');
   };
 
   return (

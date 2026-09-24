@@ -231,6 +231,7 @@ export const copy = {
     },
     analysing: {
       title: 'Looking at your photo',
+      photoLabel: 'Your scan photo',
       statuses: {
         uploading: 'Uploading your photo',
         queued: 'Getting ready',
