@@ -39,7 +39,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "types:db": "npx supabase gen types typescript --project-id yheevhjamvuxtnqudszk --schema public > src/types/database.ts"
+    "types:db": "npx supabase gen types typescript --project-id yheevhjamvuxtnqudszk --schema public > src/types/database.ts",
+    "calibrate": "npx --yes deno@2 run --config supabase/functions/analyze-scan/deno.json --env-file=supabase/functions/.env --allow-env=GEMINI_API_KEY --allow-net=generativelanguage.googleapis.com --allow-read=scripts/fixtures --allow-write=scripts/calibration-report.md scripts/calibrate.ts"
   },
   "private": true
 }

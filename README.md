@@ -85,6 +85,18 @@ Anonymous sign-ins are limited to 30 per hour per IP address by default
 (**Authentication → Rate Limits**). Repeated reinstalls while testing can hit
 that limit.
 
+## Scan pipeline
+
+Scans are scored by the `analyze-scan` Edge Function, which is the only place
+the Gemini key exists. To set it up:
+
+1. Run `supabase/migrations/0003_scan_pipeline.sql` in the SQL editor. It
+   turns on Realtime for `scans`, which the app uses to follow each scan.
+2. Set the `GEMINI_API_KEY` secret and deploy the function, as described in
+   `supabase/functions/analyze-scan/README.md`.
+3. Run the calibration harness before trusting the scores:
+   `npm run calibrate` (see `scripts/README.md`).
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.
@@ -116,7 +128,8 @@ src/
   constants/             all user-facing copy
 supabase/
   migrations/
-  functions/             Edge Functions
+  functions/             Edge Functions (Deno)
+scripts/                 calibration harness (Deno)
 assets/
 ```
 
