@@ -295,8 +295,10 @@ export const copy = {
 
   share: {
     title: 'Share your progress',
+    format: 'Format',
     formatStory: 'Story',
     formatFeed: 'Feed',
+    preview: 'Preview of the image you will share',
     includePhoto: 'Include my photo',
     includePhotoHint: 'Off by default. Your photo is only added if you turn this on.',
     includePhotoConfirm: {
@@ -304,8 +306,14 @@ export const copy = {
       body: 'Your face will be visible to anyone you share this with.',
       confirm: 'Include photo',
     },
+    photoFailed: "Your photo couldn't be added. You can still share without it.",
+    shareAction: 'Share image',
+    cardBrand: 'GlowTrack',
     cardDate: (date: string) => date,
-    cardBeforeAfter: (days: number) => `${days} days apart`,
+    cardScoreChange: (before: number, after: number) => `${before} → ${after}`,
+    cardChangeNote: (change: string, apart: string) => `${change} · ${apart}`,
+    cardBeforeAfter: (days: number) =>
+      days === 0 ? 'Same day' : days === 1 ? '1 day apart' : `${days} days apart`,
     failed: "We couldn't create the image. Try again.",
   },
 

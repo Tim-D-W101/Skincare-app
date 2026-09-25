@@ -205,6 +205,54 @@ export const scanSweep = {
   peakOpacity: 0.35,
 } as const;
 
+/**
+ * The shareable result card. A fixed look that doesn't follow light or dark
+ * mode, so every shared image looks the same: high contrast, large type and
+ * no hairlines. Sizes are in card units. The card is `width` units wide and
+ * scales to whatever width it's drawn at, so the exported image stays sharp.
+ */
+export const shareCard = {
+  colors: {
+    background: '#0A504A',
+    text: '#FFFFFF',
+    /** Secondary text. Over 6:1 on the background. */
+    textMuted: 'rgba(255, 255, 255, 0.82)',
+    ring: '#96DAD0',
+    ringTrack: 'rgba(255, 255, 255, 0.18)',
+    tile: 'rgba(255, 255, 255, 0.12)',
+  },
+  width: 360,
+  /** Width of the on-screen preview, in dp. */
+  previewWidth: 200,
+  padding: 28,
+  /** Space between the groups in the middle of the card. */
+  gap: { story: 28, feed: 18 },
+  /** Ring diameter: alone, or beside the photo. */
+  ring: { story: 220, feed: 150, besidePhoto: 130 },
+  ringStroke: 16,
+  /** The score and its label inside the ring, as fractions of the ring's diameter. */
+  ringNumber: 0.3,
+  ringLabel: 0.085,
+  photo: { width: 130, height: 162, radius: 20 },
+  tileRadius: 16,
+  tilePadding: 12,
+  tileGap: 10,
+  heroGap: 16,
+  brandIcon: 22,
+  brandGap: 6,
+  /** Text sizes, with line height as a multiple of the size. */
+  type: {
+    brand: 20,
+    date: 14,
+    change: 26,
+    changeNote: 16,
+    tileValue: 28,
+    tileLabel: 14,
+    footer: 11,
+  },
+  lineHeight: 1.25,
+} as const;
+
 // ---------------------------------------------------------------------------
 // Typography
 // ---------------------------------------------------------------------------

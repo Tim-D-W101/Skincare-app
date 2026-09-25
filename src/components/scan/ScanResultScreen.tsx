@@ -95,7 +95,15 @@ function ResultReveal({
             variant="ghost"
             size="sm"
           />
-          {done ? null : (
+          {done ? (
+            <Button
+              label={copy.results.share}
+              leadingIcon="share"
+              onPress={() => router.push('/scan/share')}
+              variant="ghost"
+              size="sm"
+            />
+          ) : (
             <Button label={copy.results.tapToSkip} onPress={skip} variant="ghost" size="sm" />
           )}
         </View>

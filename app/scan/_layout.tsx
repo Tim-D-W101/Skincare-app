@@ -17,6 +17,7 @@ export default function ScanLayout() {
       {/* Leaving these goes home, handled by the screens themselves, not a swipe back. */}
       <Stack.Screen name="analysing" options={{ gestureEnabled: false }} />
       <Stack.Screen name="result" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="share" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

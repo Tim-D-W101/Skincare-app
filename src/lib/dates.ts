@@ -13,3 +13,12 @@ export function calendarDaysBetween(from: string, to: string): number {
   // Rounding absorbs the hour a daylight-saving change adds or removes.
   return Math.max(0, Math.round(days));
 }
+
+/** A date the way the phone's language writes it, such as "25 Sept 2026". */
+export function formatShortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
