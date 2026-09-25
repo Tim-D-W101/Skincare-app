@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedProps,
+  useAnimatedReaction,
+  useSharedValue,
+  withTiming,
+  type SharedValue,
+} from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import {
   getScoreColor,
@@ -21,8 +31,16 @@ export interface ScoreRingProps {
   size?: number;
   strokeWidth?: number;
   label?: string;
-  /** Sweeps the ring from 0 and counts the number up. When false, renders the final state. */
+  /**
+   * Sweeps the ring from 0 and counts the number up. When false, renders the
+   * final state. Ignored when `progress` is given.
+   */
   animate?: boolean;
+  /**
+   * Drives the sweep from outside, from 0 (empty) to 1 (the full score), so
+   * the ring can be one part of a longer sequence.
+   */
+  progress?: SharedValue<number>;
 }
 
 function clampScore(score: number): number {
@@ -41,43 +59,49 @@ export function ScoreRing({
   strokeWidth = sizes.scoreRingStroke.md,
   label,
   animate = true,
+  progress,
 }: ScoreRingProps) {
   const palette = useColors();
   const target = clampScore(score);
-  const [progress] = useState(() => new Animated.Value(animate ? 0 : target));
-  const [counted, setCounted] = useState(0);
-  const displayed = animate ? counted : target;
+  const ownProgress = useSharedValue(animate ? 0 : 1);
+  const sweep = progress ?? ownProgress;
+  // Read once, on the first render, so a ring that starts full shows its number straight away.
+  const [counted, setCounted] = useState(() => Math.round(sweep.get() * target));
 
   useEffect(() => {
+    if (progress) return;
     if (!animate) {
-      progress.setValue(target);
+      cancelAnimation(ownProgress);
+      ownProgress.set(1);
       return;
     }
+    ownProgress.set(0);
+    ownProgress.set(
+      withTiming(1, {
+        duration: motion.duration.reveal,
+        easing: Easing.bezier(...motion.easing.decelerate),
+      }),
+    );
+    return () => cancelAnimation(ownProgress);
+  }, [animate, progress, ownProgress, target]);
 
-    progress.setValue(0);
-    const listener = progress.addListener(({ value }) => setCounted(Math.round(value)));
-    const sweep = Animated.timing(progress, {
-      toValue: target,
-      duration: motion.duration.reveal,
-      easing: Easing.bezier(...motion.easing.decelerate),
-      // SVG stroke props cannot run on the native driver.
-      useNativeDriver: false,
-    });
-    sweep.start();
-
-    return () => {
-      sweep.stop();
-      progress.removeListener(listener);
-    };
-  }, [animate, target, progress]);
+  // The number follows the sweep. It only crosses to the JS thread when the whole number changes.
+  useAnimatedReaction(
+    () => Math.round(sweep.value * target),
+    (value, previous) => {
+      if (value !== previous) scheduleOnRN(setCounted, value);
+    },
+    [sweep, target],
+  );
 
   const center = size / 2;
   const ringRadius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * ringRadius;
-  const dashOffset = progress.interpolate({
-    inputRange: [0, 100],
-    outputRange: [circumference, 0],
-  });
+  const fraction = target / 100;
+
+  const arcProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - sweep.value * fraction),
+  }));
 
   return (
     <View
@@ -105,13 +129,13 @@ export function ScoreRing({
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={`${circumference} ${circumference}`}
-            strokeDashoffset={dashOffset}
+            animatedProps={arcProps}
             fill="none"
             transform={`rotate(-90 ${center} ${center})`}
           />
         </Svg>
         <View style={[StyleSheet.absoluteFill, styles.center]}>
-          <Text variant={numberVariantFor(size)}>{displayed}</Text>
+          <Text variant={numberVariantFor(size)}>{counted}</Text>
         </View>
       </View>
       {label ? (

@@ -13,7 +13,10 @@ export type IconName =
   | 'home'
   | 'settings'
   | 'close'
-  | 'flip';
+  | 'flip'
+  | 'arrowUp'
+  | 'arrowDown'
+  | 'minus';
 
 export interface IconProps {
   name: IconName;
@@ -109,5 +112,11 @@ function renderGlyph(name: IconName) {
           <Path d="M4 20v-4h4" />
         </>
       );
+    case 'arrowUp':
+      return <Path d="M12 19V5M6 11l6-6 6 6" />;
+    case 'arrowDown':
+      return <Path d="M12 5v14M6 13l6 6 6-6" />;
+    case 'minus':
+      return <Path d="M5 12h14" />;
   }
 }

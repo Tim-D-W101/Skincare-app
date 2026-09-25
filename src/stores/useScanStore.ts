@@ -6,6 +6,7 @@ import { SCANS_BUCKET } from '@/constants/scan';
 import { logInDevelopment, scanErrorMessage, toUserMessage } from '@/lib/errors';
 import { deleteLocalFile } from '@/lib/photos';
 import {
+  fetchPreviousResult,
   fetchScanResult,
   fetchScanUpdate,
   ScanSubmitError,
@@ -36,7 +37,13 @@ export type AnalysisState =
   /** Saved, waiting for the Edge Function to pick it up. */
   | { stage: 'queued'; scanId: string; startedAt: number }
   | { stage: 'processing'; scanId: string; startedAt: number }
-  | { stage: 'complete'; scanId: string; result: ScanResult }
+  | {
+      stage: 'complete';
+      scanId: string;
+      result: ScanResult;
+      /** The scan before this one, for the change since then. Null on a first scan. */
+      previous: ScanResult | null;
+    }
   /** The photo couldn't be scored. The reason is null if it isn't one the app knows. */
   | { stage: 'rejected'; scanId: string; reason: RejectReason | null }
   | {
@@ -115,10 +122,15 @@ export const useScanStore = create<ScanState>()((set, get) => {
     loadingResults.add(scanId);
     try {
       const result = await fetchScanResult(scanId);
+      // Fetched now, so the results screen has everything the moment it opens.
+      const previous = await fetchPreviousResult(result);
       if (!isFollowing(scanId)) return;
       stopFollowing();
       // The ghost resets so next time it shows this newest photo.
-      set({ analysis: { stage: 'complete', scanId, result }, ghost: { status: 'idle' } });
+      set({
+        analysis: { stage: 'complete', scanId, result, previous },
+        ghost: { status: 'idle' },
+      });
       // The free scan is used now; bring the profile up to date.
       const refreshed = await useAuthStore.getState().refreshProfile();
       if (!refreshed.ok) logInDevelopment('Could not refresh the profile', refreshed.message);

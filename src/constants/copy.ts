@@ -279,7 +279,8 @@ export const copy = {
     observationsTitle: 'What stands out',
     focusTitle: 'Where to focus',
     changeTitle: 'Since your last scan',
-    daysSince: (days: number) => (days === 1 ? '1 day ago' : `${days} days ago`),
+    daysSince: (days: number) =>
+      days === 0 ? 'Earlier today' : days === 1 ? '1 day ago' : `${days} days ago`,
     change: {
       up: (points: number) => `Up ${points}`,
       down: (points: number) => `Down ${points}`,

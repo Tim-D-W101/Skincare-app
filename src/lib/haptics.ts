@@ -11,6 +11,11 @@ export function hapticImpact(): void {
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(logHapticFailure);
 }
 
+/** A firmer tap for a moment of arrival, such as a score landing. */
+export function hapticArrival(): void {
+  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(logHapticFailure);
+}
+
 export function hapticSelection(): void {
   Haptics.selectionAsync().catch(logHapticFailure);
 }

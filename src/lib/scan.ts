@@ -3,7 +3,7 @@ import { randomUUID } from 'expo-crypto';
 import { ANALYZE_SCAN_FUNCTION, ATTRIBUTE_KEYS, SCANS_BUCKET } from '@/constants/scan';
 import { logInDevelopment, readFunctionErrorCode } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
-import type { Json } from '@/types/database';
+import type { Json, Tables } from '@/types/database';
 import type { AttributeKey, CaptureQuality, ScanResult, ScanStatus } from '@/types/scan';
 
 /**
@@ -149,16 +149,48 @@ function stringList(value: Json): string[] {
     : [];
 }
 
+const RESULT_COLUMNS =
+  'scan_id, created_at, overall, clarity, texture, pores, hydration, redness, evenness, firmness, headline, observations, focus_areas, refer_to_professional';
+
+type ResultRow = Pick<
+  Tables<'scan_results'>,
+  | 'scan_id'
+  | 'created_at'
+  | 'overall'
+  | AttributeKey
+  | 'headline'
+  | 'observations'
+  | 'focus_areas'
+  | 'refer_to_professional'
+>;
+
 export async function fetchScanResult(scanId: string): Promise<ScanResult> {
   const { data, error } = await supabase
     .from('scan_results')
-    .select(
-      'scan_id, created_at, overall, clarity, texture, pores, hydration, redness, evenness, firmness, headline, observations, focus_areas, refer_to_professional',
-    )
+    .select(RESULT_COLUMNS)
     .eq('scan_id', scanId)
     .single();
   if (error) throw error;
+  return toScanResult(data);
+}
 
+/**
+ * The completed scan just before `result`, for the change since then. Null
+ * when `result` is the first. Row-level security limits this to the user's own.
+ */
+export async function fetchPreviousResult(result: ScanResult): Promise<ScanResult | null> {
+  const { data, error } = await supabase
+    .from('scan_results')
+    .select(RESULT_COLUMNS)
+    .lt('created_at', result.createdAt)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? toScanResult(data) : null;
+}
+
+function toScanResult(data: ResultRow): ScanResult {
   return {
     scanId: data.scan_id,
     createdAt: data.created_at,

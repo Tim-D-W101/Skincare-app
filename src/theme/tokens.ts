@@ -161,6 +161,8 @@ export const sizes = {
   borderWidth: 1,
   scoreRing: { sm: 64, md: 120, lg: 180 },
   scoreRingStroke: { sm: 6, md: 10, lg: 14 },
+  /** Height of an attribute score bar. */
+  scoreBar: 8,
   skeletonLine: 14,
   /** Height of one segment of the onboarding progress bar. */
   progressSegment: 4,
@@ -299,6 +301,26 @@ export const motion = {
     pulse: 800,
     /** One pass of the scanning sweep over the photo. */
     sweep: 2400,
+  },
+  /**
+   * The results reveal, in milliseconds from arrival. The overall ring sweeps
+   * for `duration.reveal`; each later part fades and rises into place over
+   * `fade`, starting at its own time. Everything has landed by about 2.3s.
+   */
+  results: {
+    headlineAt: 900,
+    attributesAt: 1100,
+    /** Between one attribute and the next. */
+    attributeStagger: 60,
+    /** How long an attribute bar takes to fill. */
+    attributeFill: 400,
+    observationsAt: 1500,
+    observationStagger: 120,
+    focusAt: 1900,
+    changeAt: 2000,
+    fade: 300,
+    /** How far, in dp, each part rises as it fades in. */
+    rise: 12,
   },
   /** Scale applied to a button while pressed. */
   pressScale: 0.97,
