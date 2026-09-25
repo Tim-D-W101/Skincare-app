@@ -20,3 +20,9 @@ export const PHOTO_URL_RENEW_MARGIN_MS = 60_000;
 
 /** The most scans the progress screen loads. A year of weekly scans is 52. */
 export const HISTORY_LIMIT = 500;
+
+/** The comparison frame, width over height: the 3:4 of a scan photo. Either photo is cropped to it, never stretched. */
+export const COMPARE_FRAME_ASPECT = 3 / 4;
+
+/** How far one screen-reader step moves the comparison slider, as a fraction of the width. */
+export const COMPARE_STEP = 0.1;

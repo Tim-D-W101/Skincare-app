@@ -12,7 +12,7 @@ export interface ResultChangeProps {
   previous: ScanResult;
 }
 
-interface Change {
+export interface Change {
   text: string;
   icon: IconName;
   color: ColorName;
@@ -22,7 +22,7 @@ interface Change {
  * Describes a change in words and a direction arrow, so it never relies on
  * colour. A drop is shown in a neutral tone: it's information, not a warning.
  */
-function describeChange(delta: number): Change {
+export function describeChange(delta: number): Change {
   if (delta > 0) return { text: copy.results.change.up(delta), icon: 'arrowUp', color: 'accent' };
   if (delta < 0) {
     return { text: copy.results.change.down(-delta), icon: 'arrowDown', color: 'textSecondary' };

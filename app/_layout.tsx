@@ -1,6 +1,8 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { StartupScreen } from '@/components/auth/StartupScreen';
 import { isOnboarded } from '@/lib/onboarding';
@@ -57,9 +59,16 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    // Gestures anywhere in the app (the comparison slider) need this at the root.
+    <GestureHandlerRootView style={styles.root}>
       <StatusBar style="auto" />
       {content}
-    </>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

@@ -231,6 +231,16 @@ export const chart = {
 } as const;
 
 /**
+ * The before-and-after slider. Its handle and labels sit on photos, so they
+ * use the fixed over-photo colours (`cameraColors`), not the theme.
+ */
+export const compareSlider = {
+  divider: 2,
+  handle: 44,
+  handleBorder: 2,
+} as const;
+
+/**
  * The shareable result card. A fixed look that doesn't follow light or dark
  * mode, so every shared image looks the same: high contrast, large type and
  * no hairlines. Sizes are in card units. The card is `width` units wide and
@@ -276,6 +286,14 @@ export const shareCard = {
     footer: 11,
   },
   lineHeight: 1.25,
+  /** The before-and-after card (story size), on the same colours and type. */
+  compare: {
+    photo: { width: 140, height: 175 },
+    photoGap: 16,
+    type: { title: 26, overall: 40, value: 15, label: 13 },
+    rowGap: 10,
+    gap: 14,
+  },
 } as const;
 
 // ---------------------------------------------------------------------------

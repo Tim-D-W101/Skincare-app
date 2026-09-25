@@ -8,7 +8,7 @@ import type { ShareFormat } from '@/constants/share';
  * path, a signed URL, an email address or any text from a scan.
  */
 export interface AnalyticsEvents {
-  share_initiated: { surface: 'results'; format: ShareFormat };
+  share_initiated: { surface: 'results' | 'compare'; format: ShareFormat };
 }
 
 export type EventName = keyof AnalyticsEvents;

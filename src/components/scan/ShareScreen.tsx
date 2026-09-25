@@ -1,8 +1,7 @@
-import * as Sharing from 'expo-sharing';
 import { Redirect, router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, PixelRatio, Pressable, StyleSheet, Switch, View } from 'react-native';
-import { captureRef, releaseCapture } from 'react-native-view-shot';
+import { PixelRatio, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { releaseCapture } from 'react-native-view-shot';
 
 import { Button, Disclaimer, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
@@ -10,6 +9,7 @@ import { DEFAULT_SHARE_FORMAT, SHARE_FORMATS, type ShareFormat } from '@/constan
 import { track } from '@/lib/analytics';
 import { logInDevelopment } from '@/lib/errors';
 import { hapticSelection } from '@/lib/haptics';
+import { captureCard, confirmPhotoShare, openShareSheet } from '@/lib/shareImage';
 import { useScanStore } from '@/stores/useScanStore';
 import { radius, shareCard, sizes, spacing, useColors } from '@/theme/tokens';
 import type { ScanResult } from '@/types/scan';
@@ -73,16 +73,10 @@ function ShareComposer({
       setIncludePhoto(false);
       return;
     }
-    Alert.alert(copy.share.includePhotoConfirm.title, copy.share.includePhotoConfirm.body, [
-      { text: copy.common.cancel, style: 'cancel' },
-      {
-        text: copy.share.includePhotoConfirm.confirm,
-        onPress: () => {
-          setPhotoState('loading');
-          setIncludePhoto(true);
-        },
-      },
-    ]);
+    confirmPhotoShare(() => {
+      setPhotoState('loading');
+      setIncludePhoto(true);
+    });
   };
 
   const handlePhotoError = () => {
@@ -93,16 +87,10 @@ function ShareComposer({
   const share = async () => {
     setStatus('sharing');
     try {
-      if (!(await Sharing.isAvailableAsync())) throw new Error('Sharing is not available');
-      const uri = await captureRef(cardRef, {
-        format: 'png',
-        result: 'tmpfile',
-        width: exported.width,
-        height: exported.height,
-      });
+      const uri = await captureCard(cardRef, exported);
       captured.current.push(uri);
       track('share_initiated', { surface: 'results', format });
-      await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: copy.share.title });
+      await openShareSheet(uri);
       setStatus('idle');
     } catch (error: unknown) {
       logInDevelopment('Could not share the result card', error);

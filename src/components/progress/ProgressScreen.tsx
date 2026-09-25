@@ -15,6 +15,7 @@ import { copy } from '@/constants/copy';
 import { useProgressStore } from '@/stores/useProgressStore';
 import { spacing } from '@/theme/tokens';
 
+import { CompareEntry } from './CompareEntry';
 import { ProgressHero } from './ProgressHero';
 import { ProgressTrend } from './ProgressTrend';
 import { ScanHistory } from './ScanHistory';
@@ -82,6 +83,7 @@ export function ProgressScreen() {
 
       <ProgressHero records={records} />
       <ProgressTrend records={records} />
+      <CompareEntry scanCount={records.length} />
       <StreakCard scanDates={records.map((record) => record.result.createdAt)} />
       <ScanHistory records={records} />
       <Disclaimer />

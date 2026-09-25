@@ -56,17 +56,7 @@ export function ShareCard({
 
   return (
     <View style={[styles.card, { width, height, padding: shareCard.padding * unit }]}>
-      <View style={styles.header}>
-        <View style={[styles.brand, { gap: shareCard.brandGap * unit }]}>
-          <Icon name="sparkle" size={shareCard.brandIcon * unit} tint={shareCard.colors.text} />
-          <CardText unit={unit} size={shareCard.type.brand} bold>
-            {copy.share.cardBrand}
-          </CardText>
-        </View>
-        <CardText unit={unit} size={shareCard.type.date} muted>
-          {copy.share.cardDate(formatShortDate(result.createdAt))}
-        </CardText>
-      </View>
+      <CardHeader unit={unit} detail={copy.share.cardDate(formatShortDate(result.createdAt))} />
 
       <View style={[styles.middle, { gap: shareCard.gap[format] * unit }]}>
         <View style={[styles.hero, { gap: shareCard.heroGap * unit }]}>
@@ -134,6 +124,23 @@ export function ShareCard({
   );
 }
 
+/** The app name on the left, a date or dates on the right. Shared with the comparison card. */
+export function CardHeader({ unit, detail }: { unit: number; detail: string }) {
+  return (
+    <View style={styles.header}>
+      <View style={[styles.brand, { gap: shareCard.brandGap * unit }]}>
+        <Icon name="sparkle" size={shareCard.brandIcon * unit} tint={shareCard.colors.text} />
+        <CardText unit={unit} size={shareCard.type.brand} bold>
+          {copy.share.cardBrand}
+        </CardText>
+      </View>
+      <CardText unit={unit} size={shareCard.type.date} muted>
+        {detail}
+      </CardText>
+    </View>
+  );
+}
+
 function CardRing({ score, size, unit }: { score: number; size: number; unit: number }) {
   const stroke = shareCard.ringStroke * unit;
   const center = size / 2;
@@ -179,9 +186,9 @@ function CardRing({ score, size, unit }: { score: number; size: number; unit: nu
 
 /**
  * Text at a fixed card size. It ignores the phone's font scale, because the
- * card is an image with a fixed layout.
+ * card is an image with a fixed layout. Shared with the comparison card.
  */
-function CardText({
+export function CardText({
   children,
   unit,
   size,
@@ -208,6 +215,8 @@ function CardText({
         fontFamily: bold ? fontFamilies.bold : fontFamilies.regular,
         fontWeight: bold ? '700' : '400',
         color: muted ? shareCard.colors.textMuted : shareCard.colors.text,
+        // In a row, a single line may give up width and shrink its text rather than overflow.
+        flexShrink: singleLine ? 1 : 0,
       }}
     >
       {children}
