@@ -149,10 +149,10 @@ function stringList(value: Json): string[] {
     : [];
 }
 
-const RESULT_COLUMNS =
+export const RESULT_COLUMNS =
   'scan_id, created_at, overall, clarity, texture, pores, hydration, redness, evenness, firmness, headline, observations, focus_areas, refer_to_professional';
 
-type ResultRow = Pick<
+export type ResultRow = Pick<
   Tables<'scan_results'>,
   | 'scan_id'
   | 'created_at'
@@ -190,7 +190,7 @@ export async function fetchPreviousResult(result: ScanResult): Promise<ScanResul
   return data ? toScanResult(data) : null;
 }
 
-function toScanResult(data: ResultRow): ScanResult {
+export function toScanResult(data: ResultRow): ScanResult {
   return {
     scanId: data.scan_id,
     createdAt: data.created_at,

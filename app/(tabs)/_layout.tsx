@@ -28,6 +28,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="progress"
+        options={{
+          title: copy.tabs.progress,
+          tabBarIcon: ({ focused }) => (
+            <Icon name="chart" size={sizes.icon.lg} color={focused ? 'accent' : 'textSecondary'} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: copy.tabs.settings,

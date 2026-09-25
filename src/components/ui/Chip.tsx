@@ -11,15 +11,18 @@ export interface ChipProps {
   onPress: () => void;
   disabled?: boolean;
   accessibilityLabel?: string;
+  /** `checkbox` for multi-select lists (the default); `radio` when exactly one can be picked. */
+  role?: 'checkbox' | 'radio';
 }
 
-/** A selectable pill for multi-select lists. Announced as a checkbox. */
+/** A selectable pill. Announced as a checkbox, or as a radio button in a pick-one row. */
 export function Chip({
   label,
   selected,
   onPress,
   disabled = false,
   accessibilityLabel,
+  role = 'checkbox',
 }: ChipProps) {
   const palette = useColors();
   const verticalSlop = Math.max(0, (sizes.minTouchTarget - sizes.chip) / 2);
@@ -34,7 +37,7 @@ export function Chip({
       onPress={handlePress}
       disabled={disabled}
       hitSlop={{ top: verticalSlop, bottom: verticalSlop }}
-      accessibilityRole="checkbox"
+      accessibilityRole={role}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ checked: selected, disabled }}
       style={[

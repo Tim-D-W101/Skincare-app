@@ -163,6 +163,8 @@ export const sizes = {
   scoreRingStroke: { sm: 6, md: 10, lg: 14 },
   /** Height of an attribute score bar. */
   scoreBar: 8,
+  /** Scan photo thumbnails, in the photos' 3:4 shape. */
+  thumbnail: { width: 48, height: 64 },
   skeletonLine: 14,
   /** Height of one segment of the onboarding progress bar. */
   progressSegment: 4,
@@ -203,6 +205,29 @@ export const scanSweep = {
   band: 0.35,
   /** Opacity at the band's centre. It fades to nothing at both edges. */
   peakOpacity: 0.35,
+} as const;
+
+/**
+ * The progress trend chart. One series, so it follows the accent colour:
+ * a 2dp line, 4dp points with a 2dp ring in the card colour, hairline
+ * gridlines, and the noise band as a faint wash of the same hue.
+ */
+export const chart = {
+  /** Height of the plot, not counting the date labels below it. */
+  height: 180,
+  /** Room below the plot for the date labels. */
+  axisBand: 24,
+  /** Room left of the plot for the 0 / 50 / 100 labels. */
+  yLabelWidth: 32,
+  /** Space inside the plot edges, so edge points and their rings aren't cut off. */
+  inset: 10,
+  lineWidth: 2,
+  pointRadius: 4,
+  selectedRadius: 6,
+  pointRing: 2,
+  bandOpacity: 0.12,
+  /** The gridlines drawn and labelled. */
+  gridScores: [0, 50, 100],
 } as const;
 
 /**

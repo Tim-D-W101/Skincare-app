@@ -319,32 +319,60 @@ export const copy = {
 
   progress: {
     title: 'Progress',
-    journey: (points: number, weeks: number) =>
-      points >= 0
-        ? `Up ${points} points in ${weeks} ${weeks === 1 ? 'week' : 'weeks'}`
-        : `Down ${Math.abs(points)} points in ${weeks} ${weeks === 1 ? 'week' : 'weeks'}`,
+    latest: 'Latest overall score',
+    /** How long the journey so far has taken, for `journey`. */
+    journeySpan: (days: number) =>
+      days === 0
+        ? 'today'
+        : days < 14
+          ? `in ${days} ${days === 1 ? 'day' : 'days'}`
+          : `in ${Math.round(days / 7)} weeks`,
+    journey: (points: number, span: string) => {
+      if (points === 0) return `No change ${span}`;
+      const amount = Math.abs(points) === 1 ? '1 point' : `${Math.abs(points)} points`;
+      return `${points > 0 ? 'Up' : 'Down'} ${amount} ${span}`;
+    },
+    sinceFirst: 'Since your first scan',
     oneScan: {
       title: 'Your baseline is set',
       body: 'Your second scan is where this gets interesting. That is when you start to see change.',
       nextScan: (date: string) => `Suggested next scan: ${date}`,
+      nextScanNow: 'Your next scan is ready whenever you are.',
+      cta: 'Take a scan',
     },
     noScans: {
       title: 'No scans yet',
       body: 'Your first scan sets the baseline everything else is compared with.',
       cta: 'Take a scan',
     },
+    loadFailed: "Your progress didn't load. Check your connection and try again.",
     chart: {
       title: 'Over time',
       noiseBand: 'Small shifts inside the shaded band are normal photo-to-photo variation.',
       filterOverall: 'Overall',
+      filterLabel: 'Show on the chart',
+      range: 'Scores run from 0 to 100.',
+      needTwo: 'Your trend line appears after your second scan.',
+      /** Screen reader name for the chart. */
+      label: (metric: string, count: number) => `${metric} over time, ${count} scans`,
+      point: (date: string, score: number) => `${date}: ${score}`,
+      hint: 'Swipe up or down to move between scans.',
+      viewScan: 'View this scan',
     },
     history: {
       title: 'Scan history',
       delta: (points: number) => (points > 0 ? `+${points}` : `${points}`),
+      baseline: 'Baseline',
+      thumbnail: 'Scan photo',
+      row: (date: string, score: number, change: string) => `${date}, overall ${score}, ${change}`,
+      changeUp: (points: number) => `up ${points}`,
+      changeDown: (points: number) => `down ${points}`,
+      changeSame: 'no change',
     },
     streak: {
       title: 'Weekly streak',
       weeks: (count: number) => (count === 1 ? '1 week' : `${count} weeks`),
+      keepGoing: 'A scan each week keeps it going.',
       restart: "Let's start a new one. One scan this week gets it going.",
     },
     compare: {
@@ -441,6 +469,7 @@ export const copy = {
 
   tabs: {
     home: 'Home',
+    progress: 'Progress',
     settings: 'Settings',
   },
 

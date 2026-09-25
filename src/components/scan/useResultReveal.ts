@@ -38,13 +38,17 @@ export interface ResultReveal {
  * the end. With reduce motion on, it starts at the end: nothing moves, and
  * the screen reads fully from the first frame. The haptic fires once, when the
  * overall score lands or when the reveal is skipped, whichever comes first.
+ *
+ * With `animate` false (a past scan opened from the history) it starts at the
+ * end and stays quiet: the reveal and the haptic belong to a scan's arrival.
  */
-export function useResultReveal(duration: number): ResultReveal {
+export function useResultReveal(duration: number, animate = true): ResultReveal {
   // Reanimated reads this synchronously, so the first frame is already right.
   const reduceMotion = useReducedMotion();
-  const clock = useSharedValue(reduceMotion ? duration : 0);
-  const [done, setDone] = useState(reduceMotion);
-  const landed = useRef(false);
+  const still = reduceMotion || !animate;
+  const clock = useSharedValue(still ? duration : 0);
+  const [done, setDone] = useState(still);
+  const landed = useRef(!animate);
 
   const land = useCallback(() => {
     if (landed.current) return;
@@ -53,19 +57,19 @@ export function useResultReveal(duration: number): ResultReveal {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(land, reduceMotion ? 0 : motion.duration.reveal);
+    const timer = setTimeout(land, still ? 0 : motion.duration.reveal);
     return () => clearTimeout(timer);
-  }, [land, reduceMotion]);
+  }, [land, still]);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (still) return;
     clock.set(
       withTiming(duration, { duration, easing: Easing.linear }, (finished) => {
         if (finished) scheduleOnRN(setDone, true);
       }),
     );
     return () => cancelAnimation(clock);
-  }, [clock, duration, reduceMotion]);
+  }, [clock, duration, still]);
 
   const skip = useCallback(() => {
     if (done) return;
