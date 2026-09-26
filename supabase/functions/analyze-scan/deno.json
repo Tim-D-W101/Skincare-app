@@ -1,0 +1,8 @@
+{
+  "nodeModulesDir": "none",
+  "lock": false,
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.116.0",
+    "zod": "npm:zod@4.6.5"
+  }
+}

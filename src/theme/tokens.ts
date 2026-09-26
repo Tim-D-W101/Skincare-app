@@ -96,6 +96,22 @@ export const colors: Record<ColorSchemeName, ColorPalette> = {
   dark: darkColors,
 };
 
+/**
+ * Colours for screens drawn over a live camera feed. The feed looks the same
+ * in light and dark mode, so these don't switch with the system setting.
+ */
+export const cameraColors = {
+  background: '#000000',
+  /** Dims everything outside the face oval. */
+  scrim: 'rgba(13, 16, 15, 0.6)',
+  /** Behind buttons and the guidance line. */
+  control: 'rgba(13, 16, 15, 0.55)',
+  text: '#FFFFFF',
+  ovalIdle: 'rgba(255, 255, 255, 0.75)',
+  ovalReady: '#70BFB4',
+  shutter: '#FFFFFF',
+} as const;
+
 /** Returns the palette for the device's current light/dark setting. */
 export function useColors(): ColorPalette {
   const scheme = useColorScheme();
@@ -145,15 +161,142 @@ export const sizes = {
   borderWidth: 1,
   scoreRing: { sm: 64, md: 120, lg: 180 },
   scoreRingStroke: { sm: 6, md: 10, lg: 14 },
+  /** Height of an attribute score bar. */
+  scoreBar: 8,
+  /** The tick box on a routine step, and its border. */
+  checkbox: 24,
+  checkboxBorder: 2,
+  /** Scan photo thumbnails, in the photos' 3:4 shape. */
+  thumbnail: { width: 48, height: 64 },
   skeletonLine: 14,
+  /** Height of one segment of the onboarding progress bar. */
+  progressSegment: 4,
   /** Width of the last skeleton line, so the block reads as a paragraph. */
   skeletonShortLine: '60%',
 } as const;
 
 export const opacity = {
   disabled: 0.4,
+  pressed: 0.7,
   skeletonLow: 0.4,
   skeletonHigh: 1,
+} as const;
+
+/** Layout of the capture screen. Oval values are fractions of the preview size. */
+export const camera = {
+  ovalWidth: 0.72,
+  /** Oval height divided by its width. */
+  ovalAspect: 1.32,
+  /** Cap on the oval's height, for short screens. */
+  ovalMaxHeight: 0.6,
+  /** Vertical centre of the oval: a little above the middle, clear of the controls. */
+  ovalCenterY: 0.42,
+  ovalStroke: 3,
+  shutter: 76,
+  shutterRing: 4,
+  /** Opacity of the previous scan photo shown over the preview. */
+  ghostOpacity: 0.2,
+} as const;
+
+/**
+ * The scanning sweep over the photo while a scan is analysed. A fixed colour:
+ * it sits on a photo, which looks the same in light and dark mode.
+ */
+export const scanSweep = {
+  color: '#70BFB4',
+  /** Height of the moving band, as a fraction of the photo's height. */
+  band: 0.35,
+  /** Opacity at the band's centre. It fades to nothing at both edges. */
+  peakOpacity: 0.35,
+} as const;
+
+/**
+ * The progress trend chart. One series, so it follows the accent colour:
+ * a 2dp line, 4dp points with a 2dp ring in the card colour, hairline
+ * gridlines, and the noise band as a faint wash of the same hue.
+ */
+export const chart = {
+  /** Height of the plot, not counting the date labels below it. */
+  height: 180,
+  /** Room below the plot for the date labels. */
+  axisBand: 24,
+  /** Room left of the plot for the 0 / 50 / 100 labels. */
+  yLabelWidth: 32,
+  /** Space inside the plot edges, so edge points and their rings aren't cut off. */
+  inset: 10,
+  lineWidth: 2,
+  pointRadius: 4,
+  selectedRadius: 6,
+  pointRing: 2,
+  bandOpacity: 0.12,
+  /** The gridlines drawn and labelled. */
+  gridScores: [0, 50, 100],
+} as const;
+
+/**
+ * The before-and-after slider. Its handle and labels sit on photos, so they
+ * use the fixed over-photo colours (`cameraColors`), not the theme.
+ */
+export const compareSlider = {
+  divider: 2,
+  handle: 44,
+  handleBorder: 2,
+} as const;
+
+/**
+ * The shareable result card. A fixed look that doesn't follow light or dark
+ * mode, so every shared image looks the same: high contrast, large type and
+ * no hairlines. Sizes are in card units. The card is `width` units wide and
+ * scales to whatever width it's drawn at, so the exported image stays sharp.
+ */
+export const shareCard = {
+  colors: {
+    background: '#0A504A',
+    text: '#FFFFFF',
+    /** Secondary text. Over 6:1 on the background. */
+    textMuted: 'rgba(255, 255, 255, 0.82)',
+    ring: '#96DAD0',
+    ringTrack: 'rgba(255, 255, 255, 0.18)',
+    tile: 'rgba(255, 255, 255, 0.12)',
+  },
+  width: 360,
+  /** Width of the on-screen preview, in dp. */
+  previewWidth: 200,
+  padding: 28,
+  /** Space between the groups in the middle of the card. */
+  gap: { story: 28, feed: 18 },
+  /** Ring diameter: alone, or beside the photo. */
+  ring: { story: 220, feed: 150, besidePhoto: 130 },
+  ringStroke: 16,
+  /** The score and its label inside the ring, as fractions of the ring's diameter. */
+  ringNumber: 0.3,
+  ringLabel: 0.085,
+  photo: { width: 130, height: 162, radius: 20 },
+  tileRadius: 16,
+  tilePadding: 12,
+  tileGap: 10,
+  heroGap: 16,
+  brandIcon: 22,
+  brandGap: 6,
+  /** Text sizes, with line height as a multiple of the size. */
+  type: {
+    brand: 20,
+    date: 14,
+    change: 26,
+    changeNote: 16,
+    tileValue: 28,
+    tileLabel: 14,
+    footer: 11,
+  },
+  lineHeight: 1.25,
+  /** The before-and-after card (story size), on the same colours and type. */
+  compare: {
+    photo: { width: 140, height: 175 },
+    photoGap: 16,
+    type: { title: 26, overall: 40, value: 15, label: 13 },
+    rowGap: 10,
+    gap: 14,
+  },
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -250,9 +393,41 @@ export const motion = {
     reveal: 900,
     /** One half-cycle of the skeleton pulse. */
     pulse: 800,
+    /** One pass of the scanning sweep over the photo. */
+    sweep: 2400,
+  },
+  /**
+   * The results reveal, in milliseconds from arrival. The overall ring sweeps
+   * for `duration.reveal`; each later part fades and rises into place over
+   * `fade`, starting at its own time. Everything has landed by about 2.3s.
+   */
+  results: {
+    headlineAt: 900,
+    attributesAt: 1100,
+    /** Between one attribute and the next. */
+    attributeStagger: 60,
+    /** How long an attribute bar takes to fill. */
+    attributeFill: 400,
+    observationsAt: 1500,
+    observationStagger: 120,
+    focusAt: 1900,
+    changeAt: 2000,
+    fade: 300,
+    /** How far, in dp, each part rises as it fades in. */
+    rise: 12,
   },
   /** Scale applied to a button while pressed. */
   pressScale: 0.97,
+  /**
+   * Horizontal swipe between steps. A drag becomes a swipe once it travels
+   * `activation` dp mostly sideways; it counts on release past `distance` dp
+   * or faster than `velocity` dp/ms.
+   */
+  swipe: {
+    activation: 12,
+    distance: 60,
+    velocity: 0.35,
+  },
   easing: {
     /** Most on-screen movement: quick start, gentle settle. */
     standard: [0.2, 0, 0, 1],

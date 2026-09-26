@@ -69,6 +69,37 @@ npm run types:db
 `types:db` runs the Supabase CLI through `npx`, so it is not a project
 dependency. Never edit `database.ts` by hand.
 
+## Auth settings
+
+Every new install is signed in anonymously, and email sign-in uses emailed
+links. The app can't start until these are set in the Supabase dashboard:
+
+1. **Authentication → Sign In / Providers:** turn on **Allow anonymous
+   sign-ins**, and **Allow manual linking**, which Supabase requires for
+   turning an anonymous user into one with an email.
+2. **Authentication → URL Configuration → Redirect URLs:** add
+   `glowtrack://**` (installed builds) and `exp://**` (Expo Go). Email links
+   only return to the app if their redirect is on this list.
+
+Anonymous sign-ins are limited to 30 per hour per IP address by default
+(**Authentication → Rate Limits**). Repeated reinstalls while testing can hit
+that limit.
+
+## Scan pipeline
+
+Scans are scored by the `analyze-scan` Edge Function, which is the only place
+the Gemini key exists. To set it up:
+
+1. Run `supabase/migrations/0003_scan_pipeline.sql`, then
+   `supabase/migrations/0004_routines.sql`, in the SQL editor. They turn on
+   Realtime for `scans`, which the app uses to follow each scan, and let each
+   scan save its routine alongside its scores. Run 0004 before deploying the
+   Phase 9 version of the function.
+2. Set the `GEMINI_API_KEY` secret and deploy the function, as described in
+   `supabase/functions/analyze-scan/README.md`.
+3. Run the calibration harness before trusting the scores:
+   `npm run calibrate` (see `scripts/README.md`).
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.
@@ -100,7 +131,8 @@ src/
   constants/             all user-facing copy
 supabase/
   migrations/
-  functions/             Edge Functions
+  functions/             Edge Functions (Deno)
+scripts/                 calibration harness (Deno)
 assets/
 ```
 

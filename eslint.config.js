@@ -9,4 +9,8 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*', 'build/*', '.expo/*', 'node_modules/*', 'expo-env.d.ts'],
   },
+  {
+    // Deno code, linted with `deno lint` instead.
+    ignores: ['supabase/functions/**', 'scripts/**'],
+  },
 ]);

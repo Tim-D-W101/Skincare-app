@@ -9,3 +9,4 @@ export { LoadingState, type LoadingStateProps } from './LoadingState';
 export { ScoreRing, type ScoreRingProps } from './ScoreRing';
 export { Screen, type ScreenProps } from './Screen';
 export { Text, type TextProps } from './Text';
+export { TextField, type TextFieldProps } from './TextField';

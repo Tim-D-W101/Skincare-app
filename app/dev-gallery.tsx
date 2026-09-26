@@ -12,6 +12,7 @@ import {
   ScoreRing,
   Screen,
   Text,
+  TextField,
   type ButtonSize,
   type ButtonVariant,
 } from '@/components/ui';
@@ -181,6 +182,15 @@ export default function DevGallery() {
       <Section title={gallery.sections.disclaimer}>
         <Disclaimer variant="short" />
         <Disclaimer variant="full" />
+      </Section>
+
+      <Section title={gallery.sections.textField}>
+        <TextField label={gallery.textFieldLabel} placeholder={gallery.textFieldPlaceholder} />
+        <TextField
+          label={gallery.textFieldLabel}
+          placeholder={gallery.textFieldPlaceholder}
+          error={gallery.textFieldError}
+        />
       </Section>
     </Screen>
   );

@@ -40,7 +40,9 @@ export const copy = {
       body: 'Take a photo each week and watch how your skin looks change over time.',
       note: 'GlowTrack gives cosmetic estimates, not professional skincare advice.',
       start: 'Get started',
+      signIn: 'I already have an account',
     },
+    progress: 'Setup progress',
     ageBand: {
       title: 'How old are you?',
       body: 'Skin looks different at different ages, so this helps set your baseline.',
@@ -81,11 +83,11 @@ export const copy = {
       limitReached: (max: number) => `You can pick up to ${max}.`,
       options: {
         blemishes: 'Visible blemishes',
-        unevenTone: 'Uneven tone',
+        uneven_tone: 'Uneven tone',
         pores: 'Visible pores',
         dryness: 'Dryness',
         dullness: 'Dullness',
-        fineLines: 'Fine lines',
+        fine_lines: 'Fine lines',
         redness: 'Redness',
         oiliness: 'Oiliness',
       },
@@ -96,7 +98,7 @@ export const copy = {
       options: {
         clearer: 'Clearer-looking skin',
         smoother: 'Smoother texture',
-        evenTone: 'A more even tone',
+        even_tone: 'A more even tone',
         glow: 'More glow',
         hydrated: 'Skin that looks more hydrated',
         consistency: 'A routine I actually stick to',
@@ -105,9 +107,25 @@ export const copy = {
     ready: {
       title: "You're all set",
       summary: (skinType: string, goal: string) =>
-        `Your skin is ${skinType.toLowerCase()} and you're focusing on ${goal.toLowerCase()}. Your first scan sets the baseline.`,
+        `You have ${skinType} skin and you're focusing on ${goal}. Your first scan sets the baseline.`,
       summaryUnsure: (goal: string) =>
-        `You're focusing on ${goal.toLowerCase()}. Your first scan sets the baseline, and helps work out your skin type too.`,
+        `You're focusing on ${goal}. Your first scan sets the baseline.`,
+      /** Mid-sentence wording for the summary, so labels never need re-casing. */
+      skinTypes: {
+        oily: 'oily',
+        dry: 'dry',
+        combination: 'combination',
+        normal: 'normal',
+        sensitive: 'sensitive',
+      },
+      goals: {
+        clearer: 'clearer-looking skin',
+        smoother: 'smoother texture',
+        even_tone: 'a more even tone',
+        glow: 'more glow',
+        hydrated: 'skin that looks more hydrated',
+        consistency: 'a routine you actually stick to',
+      },
       cta: 'Take my first scan',
     },
     saveError: "We couldn't save that answer. Check your connection and try again.",
@@ -137,6 +155,15 @@ export const copy = {
       body: 'Add your email so your scans and history stay with you if you change phones.',
       cta: 'Save my progress',
       saved: 'Your progress is saved to your email.',
+      emailInUse:
+        'That email already has a GlowTrack account. Sign in with it to pick up where you left off.',
+      signInInstead: 'Sign in instead',
+    },
+    callback: {
+      working: 'Signing you in',
+      failed:
+        'That link has expired or has already been used. Request a new one and open it on this phone.',
+      requestNew: 'Request a new link',
     },
     signOut: 'Sign out',
   },
@@ -162,6 +189,7 @@ export const copy = {
       openSettings: 'Open settings',
     },
     guidance: {
+      checking: 'Checking the light',
       tooDark: 'Move to brighter light',
       tooBright: 'Move out of direct light',
       holdSteady: 'Hold steady',
@@ -175,9 +203,13 @@ export const copy = {
       flipCamera: 'Switch camera',
       ghostOn: 'Show last photo',
       ghostOff: 'Hide last photo',
+      ghostUnavailable: "Last photo didn't load",
       ghostTooltip:
         'Line your face up with your last photo. Matching the position makes your before and after far easier to compare.',
       why: 'Why?',
+      processing: 'Saving your photo',
+      failed: "That photo didn't work. Try again.",
+      cameraError: "The camera couldn't start. Close any other app using it, then try again.",
     },
     tips: {
       title: 'Getting comparable photos',
@@ -193,9 +225,13 @@ export const copy = {
       title: 'Use this photo?',
       use: 'Use this',
       retake: 'Retake',
+      /** Development only: checks the photo is the size the upload expects. */
+      devSize: (width: number, height: number, kilobytes: number | null) =>
+        `${width}x${height}px${kilobytes === null ? '' : `, ${kilobytes} KB`}`,
     },
     analysing: {
       title: 'Looking at your photo',
+      photoLabel: 'Your scan photo',
       statuses: {
         uploading: 'Uploading your photo',
         queued: 'Getting ready',
@@ -243,7 +279,8 @@ export const copy = {
     observationsTitle: 'What stands out',
     focusTitle: 'Where to focus',
     changeTitle: 'Since your last scan',
-    daysSince: (days: number) => (days === 1 ? '1 day ago' : `${days} days ago`),
+    daysSince: (days: number) =>
+      days === 0 ? 'Earlier today' : days === 1 ? '1 day ago' : `${days} days ago`,
     change: {
       up: (points: number) => `Up ${points}`,
       down: (points: number) => `Down ${points}`,
@@ -258,8 +295,10 @@ export const copy = {
 
   share: {
     title: 'Share your progress',
+    format: 'Format',
     formatStory: 'Story',
     formatFeed: 'Feed',
+    preview: 'Preview of the image you will share',
     includePhoto: 'Include my photo',
     includePhotoHint: 'Off by default. Your photo is only added if you turn this on.',
     includePhotoConfirm: {
@@ -267,49 +306,100 @@ export const copy = {
       body: 'Your face will be visible to anyone you share this with.',
       confirm: 'Include photo',
     },
+    photoFailed: "Your photo couldn't be added. You can still share without it.",
+    shareAction: 'Share image',
+    cardBrand: 'GlowTrack',
     cardDate: (date: string) => date,
-    cardBeforeAfter: (days: number) => `${days} days apart`,
+    cardScoreChange: (before: number, after: number) => `${before} → ${after}`,
+    cardChangeNote: (change: string, apart: string) => `${change} · ${apart}`,
+    cardBeforeAfter: (days: number) =>
+      days === 0 ? 'Same day' : days === 1 ? '1 day apart' : `${days} days apart`,
     failed: "We couldn't create the image. Try again.",
   },
 
   progress: {
     title: 'Progress',
-    journey: (points: number, weeks: number) =>
-      points >= 0
-        ? `Up ${points} points in ${weeks} ${weeks === 1 ? 'week' : 'weeks'}`
-        : `Down ${Math.abs(points)} points in ${weeks} ${weeks === 1 ? 'week' : 'weeks'}`,
+    latest: 'Latest overall score',
+    /** How long the journey so far has taken, for `journey`. */
+    journeySpan: (days: number) =>
+      days === 0
+        ? 'today'
+        : days < 14
+          ? `in ${days} ${days === 1 ? 'day' : 'days'}`
+          : `in ${Math.round(days / 7)} weeks`,
+    journey: (points: number, span: string) => {
+      if (points === 0) return `No change ${span}`;
+      const amount = Math.abs(points) === 1 ? '1 point' : `${Math.abs(points)} points`;
+      return `${points > 0 ? 'Up' : 'Down'} ${amount} ${span}`;
+    },
+    sinceFirst: 'Since your first scan',
     oneScan: {
       title: 'Your baseline is set',
       body: 'Your second scan is where this gets interesting. That is when you start to see change.',
       nextScan: (date: string) => `Suggested next scan: ${date}`,
+      nextScanNow: 'Your next scan is ready whenever you are.',
+      cta: 'Take a scan',
     },
     noScans: {
       title: 'No scans yet',
       body: 'Your first scan sets the baseline everything else is compared with.',
       cta: 'Take a scan',
     },
+    loadFailed: "Your progress didn't load. Check your connection and try again.",
     chart: {
       title: 'Over time',
       noiseBand: 'Small shifts inside the shaded band are normal photo-to-photo variation.',
       filterOverall: 'Overall',
+      filterLabel: 'Show on the chart',
+      range: 'Scores run from 0 to 100.',
+      needTwo: 'Your trend line appears after your second scan.',
+      /** Screen reader name for the chart. */
+      label: (metric: string, count: number) => `${metric} over time, ${count} scans`,
+      point: (date: string, score: number) => `${date}: ${score}`,
+      hint: 'Swipe up or down to move between scans.',
+      viewScan: 'View this scan',
     },
     history: {
       title: 'Scan history',
       delta: (points: number) => (points > 0 ? `+${points}` : `${points}`),
+      baseline: 'Baseline',
+      thumbnail: 'Scan photo',
+      row: (date: string, score: number, change: string) => `${date}, overall ${score}, ${change}`,
+      changeUp: (points: number) => `up ${points}`,
+      changeDown: (points: number) => `down ${points}`,
+      changeSame: 'no change',
     },
     streak: {
       title: 'Weekly streak',
       weeks: (count: number) => (count === 1 ? '1 week' : `${count} weeks`),
+      keepGoing: 'A scan each week keeps it going.',
       restart: "Let's start a new one. One scan this week gets it going.",
     },
     compare: {
       title: 'Before and after',
       before: 'Before',
       after: 'After',
+      open: 'Compare two scans',
+      entryBody: 'Your photos and scores from two scans, side by side.',
       pick: 'Choose a scan',
-      elapsed: (days: number) => (days === 1 ? '1 day apart' : `${days} days apart`),
+      pickBefore: 'Choose the before scan',
+      pickAfter: 'Choose the after scan',
+      pickerRow: (date: string, score: number) => `${date}, overall ${score}`,
+      pickerScore: (score: number) => `Overall ${score}`,
+      elapsed: (days: number) =>
+        days === 0 ? 'Same day' : days === 1 ? '1 day apart' : `${days} days apart`,
       needTwo: 'You need two scans to compare. Take another scan next week.',
       sliderLabel: 'Drag to compare before and after',
+      sliderValue: (percent: number) => `Showing ${percent}% before, ${100 - percent}% after`,
+      scoresTitle: 'Scores',
+      scoreColumn: 'Score',
+      changeColumn: 'Change',
+      scoreRow: (label: string, before: number, after: number, change: string) =>
+        `${label}: ${before} before, ${after} after, ${change}`,
+      share: 'Share this comparison',
+      includePhotos: 'Include my photos',
+      photosFailed: "Your photos couldn't be added. You can still share without them.",
+      cardDates: (before: string, after: string) => `${before} – ${after}`,
     },
   },
 
@@ -318,16 +408,30 @@ export const copy = {
     morning: 'Morning',
     evening: 'Evening',
     completion: (done: number, total: number) => `${done} of ${total} done today`,
+    /** Inside the completion ring. */
+    ringValue: (done: number, total: number) => `${done}/${total}`,
+    sectionCount: (done: number, total: number) => `${done} of ${total}`,
     consistency: 'Consistency over weeks is what shows up in your scans.',
     empty: {
       title: 'Your routine appears after your first scan',
       body: "We'll suggest a few simple morning and evening steps based on how your skin looks.",
       cta: 'Take a scan',
     },
+    loadFailed: "Your routine didn't load. Check your connection and try again.",
+    reminderOffer: {
+      title: 'Want a daily nudge?',
+      body: 'We can remind you once a day to do your routine. You can change it or turn it off any time in Settings.',
+      morning: 'Mornings',
+      evening: 'Evenings',
+      notNow: 'Not now',
+    },
     saveFailed: "That didn't save. We'll try again when you're back online.",
+    tickFailed: "That didn't save. Try again.",
   },
 
   notifications: {
+    /** The Android notification channel, as shown in the phone's settings. */
+    channelName: 'Reminders',
     permission: {
       title: 'A weekly nudge?',
       body: 'We can remind you once a week to take your scan, on the day and time you choose. At most one notification a day, and you can turn it off any time.',
@@ -394,6 +498,13 @@ export const copy = {
       'Your subscription has ended. Your history is still here, and you can subscribe again to keep scanning.',
   },
 
+  tabs: {
+    home: 'Home',
+    progress: 'Progress',
+    routine: 'Routine',
+    settings: 'Settings',
+  },
+
   settings: {
     title: 'Settings',
     account: {
@@ -411,12 +522,33 @@ export const copy = {
     },
     reminders: {
       title: 'Reminders',
+      oneADay: 'At most one reminder a day, whatever is switched on.',
+      enable: 'Turn on reminders',
+      openSettings: 'Open settings',
       master: 'Allow reminders',
       weekly: 'Weekly scan reminder',
+      weeklyHint: 'A week after your last scan, on the day and time you choose.',
       day: 'Day',
       time: 'Time',
-      morning: 'Morning routine reminder',
-      evening: 'Evening routine reminder',
+      earlier: 'Earlier',
+      later: 'Later',
+      /** Monday first. Short labels for the day picker, then the full name for screen readers. */
+      weekdays: [
+        { value: 1, short: 'Mon', name: 'Monday' },
+        { value: 2, short: 'Tue', name: 'Tuesday' },
+        { value: 3, short: 'Wed', name: 'Wednesday' },
+        { value: 4, short: 'Thu', name: 'Thursday' },
+        { value: 5, short: 'Fri', name: 'Friday' },
+        { value: 6, short: 'Sat', name: 'Saturday' },
+        { value: 0, short: 'Sun', name: 'Sunday' },
+      ],
+      routine: 'Daily routine reminder',
+      routineHint: "On the day a scan reminder arrives, it takes this one's place.",
+      routineLocked: 'Available once you have used your routine a couple of times.',
+      routineOptions: { off: 'Off', morning: 'Morning', evening: 'Evening' },
+      streak: 'Streak reminder',
+      streakHint: 'Only when a streak of 2 weeks or more is about to end.',
+      saveFailed: "That setting didn't save. Check your connection and try again.",
     },
     data: {
       title: 'Your data',
@@ -455,6 +587,7 @@ export const copy = {
     offline: "You're offline. Check your connection and try again.",
     timeout: 'This is taking too long. Check your connection and try again.',
     sessionExpired: 'You were signed out. Sign in again to continue.',
+    rateLimited: 'Too many tries in a row. Wait a minute, then try again.',
     /** Codes returned by the analyze-scan Edge Function. */
     scan: {
       UNAUTHORIZED: 'You were signed out. Sign in again to continue.',
@@ -494,6 +627,7 @@ export const copy = {
       loadingState: 'Loading state',
       errorState: 'Error state',
       disclaimer: 'Disclaimer',
+      textField: 'Text field',
     },
     textSample: 'Your routine, week by week.',
     buttons: {
@@ -514,6 +648,9 @@ export const copy = {
     emptyTitle: 'No scans yet',
     emptyBody: 'Your first scan sets the baseline everything else is compared with.',
     emptyAction: 'Take a scan',
+    textFieldLabel: 'Email address',
+    textFieldPlaceholder: 'you@example.com',
+    textFieldError: "That doesn't look like an email address.",
   },
 } as const;
 
