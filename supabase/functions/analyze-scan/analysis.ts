@@ -1,17 +1,19 @@
 import { z } from 'zod';
 
-import { findBannedTerms } from './compliance.ts';
+import { findBannedTerms, findRoutineProblems } from './compliance.ts';
 import { estimateCostUsd, generateContentUrl, MODEL } from './model.ts';
 import {
   ATTRIBUTE_KEYS,
   REJECT_REASONS,
   RESPONSE_SCHEMA,
   RETRY_INSTRUCTION,
+  ROUTINE_STEP_KEYS,
   SYSTEM_PROMPT,
   USER_INSTRUCTION,
   type AttributeKey,
   type RejectReason,
 } from './prompt.ts';
+import { buildRoutine, type RoutineStep } from './routine.ts';
 import { clampScore, weightedOverall } from './scoring.ts';
 
 /**
@@ -34,7 +36,7 @@ export interface Usage {
 /** One call to the model. `problem` says why its reply wasn't used, or is null when it was. */
 export interface Attempt {
   problem: string | null;
-  /** Banned terms that made the reply unusable, if that was the problem. */
+  /** Banned terms, or routine rules broken, that made the reply unusable, if that was the problem. */
   bannedTerms: string[];
   usage: Usage | null;
 }
@@ -67,6 +69,8 @@ export interface ScoredAnalysis {
   observations: string[];
   focusAreas: AttributeKey[];
   referToProfessional: boolean;
+  /** Morning then evening steps, in order, sunscreen closing the morning. */
+  routine: RoutineStep[];
   /** The validated model output, stored for debugging. */
   raw: unknown;
   attempts: Attempt[];
@@ -83,12 +87,22 @@ export type Analysis = ScoredAnalysis | RejectedAnalysis;
 
 const MAX_OBSERVATIONS = 4;
 const MAX_FOCUS_AREAS = 3;
+const MAX_STEP_TITLE = 60;
+const MAX_STEP_WHY = 200;
 
 // ---------------------------------------------------------------------------
 // Validation
 // ---------------------------------------------------------------------------
 
 const score = z.number();
+
+const looseStep = z.object({ key: z.string(), title: z.string(), why: z.string() });
+
+const step = z.object({
+  key: z.enum(ROUTINE_STEP_KEYS),
+  title: z.string().trim().min(1).max(MAX_STEP_TITLE),
+  why: z.string().trim().min(1).max(MAX_STEP_WHY),
+});
 
 const baseOutput = z.object({
   usable: z.boolean(),
@@ -104,6 +118,7 @@ const baseOutput = z.object({
   overall: score,
   headline: z.string(),
   focus_areas: z.array(z.string()),
+  routine: z.object({ morning: z.array(looseStep), evening: z.array(looseStep) }),
   refer_to_professional: z.boolean(),
 });
 
@@ -114,6 +129,7 @@ const modelOutput = z.discriminatedUnion('usable', [
     observations: z.array(z.string().trim().min(1)).min(1),
     headline: z.string().trim().min(1),
     focus_areas: z.array(z.enum(ATTRIBUTE_KEYS)).min(1),
+    routine: z.object({ morning: z.array(step), evening: z.array(step) }),
   }),
   baseOutput.extend({
     usable: z.literal(false),
@@ -177,7 +193,12 @@ function interpret(text: string): Interpretation {
   }
 
   const observations = output.observations.slice(0, MAX_OBSERVATIONS);
-  const bannedTerms = findBannedTerms([output.headline, ...observations].join('\n'));
+  const routineText = [...output.routine.morning, ...output.routine.evening]
+    .map((routineStep) => `${routineStep.title}\n${routineStep.why}`)
+    .join('\n');
+  const bannedTerms = findBannedTerms(
+    [output.headline, ...observations, routineText].join('\n'),
+  );
   if (bannedTerms.length > 0) {
     return {
       ok: false,
@@ -185,6 +206,18 @@ function interpret(text: string): Interpretation {
       bannedTerms,
     };
   }
+
+  const routineProblems = findRoutineProblems(routineText);
+  if (routineProblems.length > 0) {
+    return {
+      ok: false,
+      problem: `routine broke its rules (${routineProblems.join(', ')})`,
+      bannedTerms: routineProblems,
+    };
+  }
+
+  const routine = buildRoutine(output.routine);
+  if (!routine.ok) return { ok: false, problem: routine.problem, bannedTerms: [] };
 
   const scores = Object.fromEntries(
     ATTRIBUTE_KEYS.map((key) => [key, clampScore(output[key])]),
@@ -201,6 +234,7 @@ function interpret(text: string): Interpretation {
       observations,
       focusAreas: [...new Set(output.focus_areas)].slice(0, MAX_FOCUS_AREAS),
       referToProfessional: output.refer_to_professional,
+      routine: routine.steps,
       raw: output,
     },
   };

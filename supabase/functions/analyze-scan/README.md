@@ -1,13 +1,14 @@
 # analyze-scan
 
-Turns an uploaded scan photo into validated scores. The app uploads the photo,
+Turns an uploaded scan photo into validated scores and a simple routine, in
+one model call. The app uploads the photo,
 inserts a `scans` row with status `pending`, then calls this function with the
 scan id. The function checks the caller owns the scan, sends the photo to
 Gemini, validates the reply and writes the result. The app follows the row's
 status through Realtime.
 
 ```text
-pending -> processing -> complete   (scores saved, free scan used up)
+pending -> processing -> complete   (scores and routine saved, free scan used up)
                       -> rejected   (photo unusable, free scan kept)
                       -> failed     (anything else, free scan kept)
 ```
@@ -18,6 +19,7 @@ pending -> processing -> complete   (scores saved, free scan used up)
 | --------------- | ------------------------------------------------------------------------------ |
 | `index.ts`      | The HTTP handler: auth, ownership, status changes, saving the result.          |
 | `analysis.ts`   | The model call, Zod validation and the single retry. Shared with calibration.  |
+| `routine.ts`    | Puts the routine in order: sunscreen last in the morning, 3 to 5 steps a part. |
 | `prompt.ts`     | The system prompt, response schema and `PROMPT_VERSION`. Versioned.            |
 | `model.ts`      | The model name, endpoint, settings and prices. Swapping model is one line.     |
 | `scoring.ts`    | Clamping and the weighted `overall`.                                           |
@@ -50,9 +52,17 @@ refuses to start, and the error shows in its logs.
 
 ## Deploy
 
-Run the migration first: paste `supabase/migrations/0003_scan_pipeline.sql`
-into the SQL editor and run it. It turns on Realtime for `scans` and adds
-`complete_scan()`, which the function calls. It's safe to run twice.
+Run the migrations first, in order: paste each into the SQL editor and run it.
+Both are safe to run twice.
+
+- `supabase/migrations/0003_scan_pipeline.sql` turns on Realtime for `scans`
+  and adds `complete_scan()`, which the function calls.
+- `supabase/migrations/0004_routines.sql` (Phase 9) replaces `complete_scan()`
+  with a version that also saves the routine, in the same transaction.
+
+**0004 must be in place before this version of the function is deployed.** It
+sends a routine to `complete_scan()`, which the 0003 version doesn't accept,
+so until 0004 runs every scan would end `failed`.
 
 Then deploy the function:
 

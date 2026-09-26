@@ -9,7 +9,8 @@ import { ResultView } from './ResultView';
 
 /**
  * The results of the scan that has just finished, revealed in stages. Every
- * way out ends the scan flow; "See my progress" goes to the progress tab.
+ * way out ends the scan flow. "Build my routine" (first scan) goes to the
+ * routine tab and "See my progress" (repeat scans) to the progress tab.
  */
 export function ScanResultScreen() {
   // The result as it was on arrival, so leaving doesn't change the screen mid-transition.
@@ -39,6 +40,11 @@ export function ScanResultScreen() {
     router.dismissTo('/progress');
   };
 
+  const buildRoutine = () => {
+    endScanFlow();
+    router.dismissTo('/routine');
+  };
+
   return (
     <ResultView
       result={analysis.result}
@@ -49,8 +55,7 @@ export function ScanResultScreen() {
       primaryAction={
         repeat
           ? { label: copy.results.seeProgress, onPress: seeProgress }
-          : // Goes home until the routine screen exists (Phase 9).
-            { label: copy.results.buildRoutine, onPress: leave }
+          : { label: copy.results.buildRoutine, onPress: buildRoutine }
       }
     />
   );

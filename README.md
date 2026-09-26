@@ -90,8 +90,11 @@ that limit.
 Scans are scored by the `analyze-scan` Edge Function, which is the only place
 the Gemini key exists. To set it up:
 
-1. Run `supabase/migrations/0003_scan_pipeline.sql` in the SQL editor. It
-   turns on Realtime for `scans`, which the app uses to follow each scan.
+1. Run `supabase/migrations/0003_scan_pipeline.sql`, then
+   `supabase/migrations/0004_routines.sql`, in the SQL editor. They turn on
+   Realtime for `scans`, which the app uses to follow each scan, and let each
+   scan save its routine alongside its scores. Run 0004 before deploying the
+   Phase 9 version of the function.
 2. Set the `GEMINI_API_KEY` secret and deploy the function, as described in
    `supabase/functions/analyze-scan/README.md`.
 3. Run the calibration harness before trusting the scores:

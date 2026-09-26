@@ -163,6 +163,9 @@ export const sizes = {
   scoreRingStroke: { sm: 6, md: 10, lg: 14 },
   /** Height of an attribute score bar. */
   scoreBar: 8,
+  /** The tick box on a routine step, and its border. */
+  checkbox: 24,
+  checkboxBorder: 2,
   /** Scan photo thumbnails, in the photos' 3:4 shape. */
   thumbnail: { width: 48, height: 64 },
   skeletonLine: 14,

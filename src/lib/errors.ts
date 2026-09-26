@@ -89,6 +89,25 @@ export function toUserMessage(error: unknown): string {
   return copy.errors.generic;
 }
 
+/**
+ * True when a request never got an answer (no connection, timed out), so it's
+ * worth trying again later, as opposed to the server turning it down.
+ */
+export function isConnectionFailure(error: unknown): boolean {
+  if (isNetworkError(error) || isTimeoutError(error) || isAuthRetryableFetchError(error)) {
+    return true;
+  }
+  // PostgREST reports a request that never reached the server as an error
+  // with an empty code and the fetch failure as its message.
+  if (typeof error === 'object' && error !== null && 'code' in error && 'message' in error) {
+    const { code, message } = error;
+    return (
+      code === '' && typeof message === 'string' && /fetch|network|abort|timed? ?out/i.test(message)
+    );
+  }
+  return false;
+}
+
 function isNetworkError(error: unknown): boolean {
   // React Native's fetch rejects with this TypeError when there is no connection.
   return error instanceof TypeError && /network request failed/i.test(error.message);

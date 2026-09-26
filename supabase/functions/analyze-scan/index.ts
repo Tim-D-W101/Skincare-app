@@ -181,7 +181,10 @@ async function finishWithoutScores(
   if (error) throw new Error(`Could not mark the scan ${status}: ${error.message}`);
 }
 
-/** Saves the scores, completes the scan and uses up the free scan, in one transaction. */
+/**
+ * Saves the scores and the routine, completes the scan and uses up the free
+ * scan, in one transaction.
+ */
 async function completeScan(scanId: string, analysis: ScoredAnalysis): Promise<void> {
   const { error } = await admin.rpc('complete_scan', {
     p_scan_id: scanId,
@@ -196,6 +199,7 @@ async function completeScan(scanId: string, analysis: ScoredAnalysis): Promise<v
     },
     p_model: MODEL.name,
     p_prompt_version: PROMPT_VERSION,
+    p_routine: analysis.routine,
   });
   if (error) throw new Error(`Could not save the results: ${error.message}`);
 }

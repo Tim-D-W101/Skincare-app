@@ -22,7 +22,7 @@
  * the Edge Function sends.
  */
 
-export const PROMPT_VERSION = 'v1.0.0';
+export const PROMPT_VERSION = 'v2.0.0';
 
 /** Scored attributes, in display order. The database has one column per key. */
 export const ATTRIBUTE_KEYS = [
@@ -83,6 +83,101 @@ export const BANNED_TERMS = [
   'medically proven',
 ] as const;
 
+/**
+ * Routine step categories, in the order a routine is applied. The model may
+ * only use these keys; the order is enforced after the reply, whatever order
+ * the model wrote them in.
+ */
+export const ROUTINE_STEP_KEYS = [
+  'makeup_removal',
+  'cleanse',
+  'tone',
+  'serum',
+  'eye_care',
+  'moisturise',
+  'face_oil',
+  'lip_care',
+  'sunscreen',
+] as const;
+
+export type RoutineStepKey = (typeof ROUTINE_STEP_KEYS)[number];
+
+export const ROUTINE_MIN_STEPS = 3;
+export const ROUTINE_MAX_STEPS = 5;
+
+/**
+ * Ingredient words a routine must never use. A routine names generic product
+ * categories only, never what is in them.
+ */
+export const ROUTINE_INGREDIENT_TERMS = [
+  'salicylic',
+  'glycolic',
+  'lactic',
+  'mandelic',
+  'azelaic',
+  'retinol',
+  'retinoid',
+  'retinal',
+  'tretinoin',
+  'adapalene',
+  'benzoyl',
+  'niacinamide',
+  'hyaluronic',
+  'ascorbic',
+  'vitamin',
+  'aha',
+  'bha',
+  'pha',
+  'peptide',
+  'ceramide',
+  'hydroquinone',
+  'kojic',
+  'tranexamic',
+  'sulfur',
+  'sulphur',
+  'zinc',
+  'titanium',
+  'acid',
+] as const;
+
+/**
+ * Phrases a routine must never use: instructions, frequencies and promises.
+ * It offers what many people find helpful; it never tells anyone what to do,
+ * how often, or what it will change.
+ */
+export const ROUTINE_BANNED_PHRASES = [
+  'you should',
+  'you must',
+  'you need',
+  'make sure',
+  'daily',
+  'weekly',
+  'twice',
+  'once a',
+  'times a',
+  'every day',
+  'every other',
+  'per day',
+  'per week',
+  'will fix',
+  'fixes',
+  'will clear',
+  'clears up',
+  'get rid of',
+  'eliminate',
+  'guarantee',
+] as const;
+
+/**
+ * Added after the model's morning steps when it leaves sunscreen out.
+ * Sunscreen always closes the morning routine, without exception.
+ */
+export const SUNSCREEN_STEP = {
+  key: 'sunscreen',
+  title: 'A broad-spectrum sunscreen',
+  why: 'Many people finish their morning with sunscreen to help their skin keep an even look.',
+} as const;
+
 export const SYSTEM_PROMPT = `ROLE
 You are a cosmetic skin appearance analyser for a consumer beauty app. You describe the visible cosmetic appearance of skin in a photograph. This is a beauty tool, not a medical one.
 
@@ -107,7 +202,7 @@ Do this before anything else. When one of these applies, set usable to false and
   obstructed       hair, hands, glasses, a mask or anything else covers much of the face
   not_a_photo      a drawing, a screen, a printout, or anything else that is not a camera photograph of a real person
 If more than one applies, use the first one in this list that applies.
-Do not score an unusable image. When usable is false: set every score to 0, headline to an empty string, observations and focus_areas to empty lists, and refer_to_professional to false.
+Do not score an unusable image. When usable is false: set every score to 0, headline to an empty string, observations and focus_areas to empty lists, both routine parts to empty lists, and refer_to_professional to false.
 When usable is true, set reject_reason to null.
 
 STEP 2: SCORE EACH ATTRIBUTE
@@ -142,6 +237,24 @@ STEP 3: WRITE THE TEXT
 - Use the language of appearance: "the appearance of", "looks", "visible", "cosmetic".
 - Plain sentences only: no markdown, no emoji, and no numbers or scores in the text.
 
+STEP 4: SUGGEST A SIMPLE ROUTINE
+Suggest a simple cosmetic self-care routine suited to how the skin looks, in two parts:
+  morning   ${ROUTINE_MIN_STEPS} to ${ROUTINE_MAX_STEPS} steps
+  evening   ${ROUTINE_MIN_STEPS} to ${ROUTINE_MAX_STEPS} steps
+Each step has:
+  key     one of: ${ROUTINE_STEP_KEYS.join(', ')}
+  title   a generic product category in 2 to 5 words, such as "A gentle cleanser" or "A light moisturiser"
+  why     one short sentence on why many people include this step, in terms of how the skin looks
+Rules for the routine:
+- Generic product categories only. Never a brand or product name, never an ingredient of any kind, and never an amount, strength, percentage or any other number.
+- List each part's steps in this order: ${ROUTINE_STEP_KEYS.join(', ')}. Use each key at most once in a part.
+- The last morning step is always sunscreen. Sunscreen never appears in the evening, and makeup_removal only appears in the evening.
+- Offer, never instruct. Write "many people find..." or "can help the skin look...", never "you should", "you must" or "make sure".
+- Never say how often to do anything: no "daily", "weekly", "twice" or "every day".
+- Never promise what a step will change, fix or clear.
+- When usable is false, return empty lists for both parts.
+Never use these ingredient words in the routine: ${ROUTINE_INGREDIENT_TERMS.join(', ')}
+
 BANNED VOCABULARY
 Never output any of these words or phrases, in any field, in any form:
   ${BANNED_TERMS.join(', ')}
@@ -156,6 +269,22 @@ export const USER_INSTRUCTION =
 /** Added to the second and final attempt when the first reply could not be used. */
 export const RETRY_INSTRUCTION =
   'Your previous reply could not be used. Return only one valid JSON object that matches the response schema exactly, with no other text. Every field is required. Follow every rule in your instructions, including the banned vocabulary.';
+
+const routineSteps = (description: string) => ({
+  type: 'ARRAY',
+  maxItems: ROUTINE_MAX_STEPS,
+  description,
+  items: {
+    type: 'OBJECT',
+    properties: {
+      key: { type: 'STRING', enum: [...ROUTINE_STEP_KEYS] },
+      title: { type: 'STRING', description: 'A generic product category in 2 to 5 words.' },
+      why: { type: 'STRING', description: 'One short sentence, offered, never instructed.' },
+    },
+    required: ['key', 'title', 'why'],
+    propertyOrdering: ['key', 'title', 'why'],
+  },
+});
 
 const scoreProperty = (description: string) => ({
   type: 'INTEGER',
@@ -206,6 +335,15 @@ export const RESPONSE_SCHEMA = {
       maxItems: 3,
       description: '1 to 3 attribute keys to focus on, ordered by impact.',
     },
+    routine: {
+      type: 'OBJECT',
+      properties: {
+        morning: routineSteps('3 to 5 morning steps, ending with sunscreen.'),
+        evening: routineSteps('3 to 5 evening steps, never sunscreen.'),
+      },
+      required: ['morning', 'evening'],
+      propertyOrdering: ['morning', 'evening'],
+    },
     refer_to_professional: {
       type: 'BOOLEAN',
       description: 'True when something is better looked at in person. Never described.',
@@ -219,6 +357,7 @@ export const RESPONSE_SCHEMA = {
     'overall',
     'headline',
     'focus_areas',
+    'routine',
     'refer_to_professional',
   ],
   propertyOrdering: [
@@ -229,6 +368,7 @@ export const RESPONSE_SCHEMA = {
     'overall',
     'headline',
     'focus_areas',
+    'routine',
     'refer_to_professional',
   ],
 } as const;

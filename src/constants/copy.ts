@@ -408,13 +408,18 @@ export const copy = {
     morning: 'Morning',
     evening: 'Evening',
     completion: (done: number, total: number) => `${done} of ${total} done today`,
+    /** Inside the completion ring. */
+    ringValue: (done: number, total: number) => `${done}/${total}`,
+    sectionCount: (done: number, total: number) => `${done} of ${total}`,
     consistency: 'Consistency over weeks is what shows up in your scans.',
     empty: {
       title: 'Your routine appears after your first scan',
       body: "We'll suggest a few simple morning and evening steps based on how your skin looks.",
       cta: 'Take a scan',
     },
+    loadFailed: "Your routine didn't load. Check your connection and try again.",
     saveFailed: "That didn't save. We'll try again when you're back online.",
+    tickFailed: "That didn't save. Try again.",
   },
 
   notifications: {
@@ -487,6 +492,7 @@ export const copy = {
   tabs: {
     home: 'Home',
     progress: 'Progress',
+    routine: 'Routine',
     settings: 'Settings',
   },
 

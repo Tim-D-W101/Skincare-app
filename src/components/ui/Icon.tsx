@@ -19,7 +19,10 @@ export type IconName =
   | 'minus'
   | 'share'
   | 'chart'
-  | 'drag';
+  | 'drag'
+  | 'list'
+  | 'chevronDown'
+  | 'chevronUp';
 
 export interface IconProps {
   name: IconName;
@@ -121,6 +124,17 @@ function renderGlyph(name: IconName) {
       return <Path d="M12 5v14M6 13l6 6 6-6" />;
     case 'minus':
       return <Path d="M5 12h14" />;
+    case 'list':
+      return (
+        <>
+          <Path d="M9 6h11M9 12h11M9 18h11" />
+          <Path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" />
+        </>
+      );
+    case 'chevronDown':
+      return <Path d="M6 9l6 6 6-6" />;
+    case 'chevronUp':
+      return <Path d="M6 15l6-6 6 6" />;
     case 'drag':
       return (
         <>

@@ -37,6 +37,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="routine"
+        options={{
+          title: copy.tabs.routine,
+          tabBarIcon: ({ focused }) => (
+            <Icon name="list" size={sizes.icon.lg} color={focused ? 'accent' : 'textSecondary'} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: copy.tabs.settings,
