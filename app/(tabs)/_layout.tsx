@@ -2,10 +2,13 @@ import { Tabs } from 'expo-router';
 
 import { Icon } from '@/components/ui';
 import { copy } from '@/constants/copy';
+import { useReminderSync } from '@/lib/useReminderSync';
 import { sizes, typography, useColors } from '@/theme/tokens';
 
 export default function TabsLayout() {
   const palette = useColors();
+  // The tabs only mount once onboarding is done: reminders are managed from here on.
+  useReminderSync();
 
   return (
     <Tabs

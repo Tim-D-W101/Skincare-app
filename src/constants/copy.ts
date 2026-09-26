@@ -418,11 +418,20 @@ export const copy = {
       cta: 'Take a scan',
     },
     loadFailed: "Your routine didn't load. Check your connection and try again.",
+    reminderOffer: {
+      title: 'Want a daily nudge?',
+      body: 'We can remind you once a day to do your routine. You can change it or turn it off any time in Settings.',
+      morning: 'Mornings',
+      evening: 'Evenings',
+      notNow: 'Not now',
+    },
     saveFailed: "That didn't save. We'll try again when you're back online.",
     tickFailed: "That didn't save. Try again.",
   },
 
   notifications: {
+    /** The Android notification channel, as shown in the phone's settings. */
+    channelName: 'Reminders',
     permission: {
       title: 'A weekly nudge?',
       body: 'We can remind you once a week to take your scan, on the day and time you choose. At most one notification a day, and you can turn it off any time.',
@@ -513,12 +522,33 @@ export const copy = {
     },
     reminders: {
       title: 'Reminders',
+      oneADay: 'At most one reminder a day, whatever is switched on.',
+      enable: 'Turn on reminders',
+      openSettings: 'Open settings',
       master: 'Allow reminders',
       weekly: 'Weekly scan reminder',
+      weeklyHint: 'A week after your last scan, on the day and time you choose.',
       day: 'Day',
       time: 'Time',
-      morning: 'Morning routine reminder',
-      evening: 'Evening routine reminder',
+      earlier: 'Earlier',
+      later: 'Later',
+      /** Monday first. Short labels for the day picker, then the full name for screen readers. */
+      weekdays: [
+        { value: 1, short: 'Mon', name: 'Monday' },
+        { value: 2, short: 'Tue', name: 'Tuesday' },
+        { value: 3, short: 'Wed', name: 'Wednesday' },
+        { value: 4, short: 'Thu', name: 'Thursday' },
+        { value: 5, short: 'Fri', name: 'Friday' },
+        { value: 6, short: 'Sat', name: 'Saturday' },
+        { value: 0, short: 'Sun', name: 'Sunday' },
+      ],
+      routine: 'Daily routine reminder',
+      routineHint: "On the day a scan reminder arrives, it takes this one's place.",
+      routineLocked: 'Available once you have used your routine a couple of times.',
+      routineOptions: { off: 'Off', morning: 'Morning', evening: 'Evening' },
+      streak: 'Streak reminder',
+      streakHint: 'Only when a streak of 2 weeks or more is about to end.',
+      saveFailed: "That setting didn't save. Check your connection and try again.",
     },
     data: {
       title: 'Your data',

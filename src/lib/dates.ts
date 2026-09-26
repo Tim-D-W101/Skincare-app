@@ -40,3 +40,11 @@ export function formatShortDate(iso: string): string {
     year: 'numeric',
   });
 }
+
+/** An hour of the day the way the phone writes times, such as "7:00 pm" or "19:00". */
+export function formatHour(hour: number): string {
+  return new Date(2000, 0, 1, hour).toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}

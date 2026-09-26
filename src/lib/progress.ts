@@ -28,6 +28,17 @@ export async function fetchScanHistory(): Promise<ScanRecord[]> {
     .reverse();
 }
 
+/** When each completed scan was taken, oldest first. For reminders, which need nothing else. */
+export async function fetchScanDates(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('scan_results')
+    .select('created_at')
+    .order('created_at', { ascending: false })
+    .limit(HISTORY_LIMIT);
+  if (error) throw error;
+  return data.map((row) => row.created_at).reverse();
+}
+
 export interface SignedPhoto {
   url: string;
   /** Milliseconds since the epoch. */

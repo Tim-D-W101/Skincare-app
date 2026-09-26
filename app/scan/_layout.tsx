@@ -18,6 +18,7 @@ export default function ScanLayout() {
       <Stack.Screen name="analysing" options={{ gestureEnabled: false }} />
       <Stack.Screen name="result" options={{ gestureEnabled: false }} />
       <Stack.Screen name="share" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="reminders" options={{ gestureEnabled: false }} />
     </Stack>
   );
 }

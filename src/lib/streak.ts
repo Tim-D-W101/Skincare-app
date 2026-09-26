@@ -1,5 +1,5 @@
 /** Midnight on the Monday that starts the week containing `date`, in the phone's time zone. */
-function startOfWeek(date: Date): Date {
+export function startOfWeek(date: Date): Date {
   const daysSinceMonday = (date.getDay() + 6) % 7;
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() - daysSinceMonday);
 }

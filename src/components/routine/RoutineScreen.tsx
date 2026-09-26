@@ -7,11 +7,13 @@ import { copy } from '@/constants/copy';
 import { EVENING_FROM_HOUR, MIDNIGHT_GRACE_MS } from '@/constants/routine';
 import { msUntilLocalMidnight } from '@/lib/dates';
 import { tickKey } from '@/lib/routine';
+import { useReminderStore } from '@/stores/useReminderStore';
 import { useRoutineStore } from '@/stores/useRoutineStore';
 import { spacing } from '@/theme/tokens';
 import type { RoutineSlot } from '@/types/routine';
 
 import { CompletionRing } from './CompletionRing';
+import { RoutineReminderOffer } from './RoutineReminderOffer';
 import { RoutineSection } from './RoutineSection';
 
 function currentSlot(): RoutineSlot {
@@ -32,6 +34,7 @@ export function RoutineScreen() {
   const load = useRoutineStore((state) => state.load);
   const toggle = useRoutineStore((state) => state.toggle);
   const checkDay = useRoutineStore((state) => state.checkDay);
+  const recordRoutineVisit = useReminderStore((state) => state.recordRoutineVisit);
   const [expanded, setExpanded] = useState<Record<RoutineSlot, boolean>>(() => {
     const slot = currentSlot();
     return { morning: slot === 'morning', evening: slot === 'evening' };
@@ -41,7 +44,8 @@ export function RoutineScreen() {
     useCallback(() => {
       checkDay();
       void load();
-    }, [checkDay, load]),
+      recordRoutineVisit();
+    }, [checkDay, load, recordRoutineVisit]),
   );
 
   // Rolls over at local midnight while the tab is open.
@@ -98,6 +102,8 @@ export function RoutineScreen() {
           {notice === 'offline' ? copy.routine.saveFailed : copy.routine.tickFailed}
         </Text>
       ) : null}
+
+      <RoutineReminderOffer />
 
       <RoutineSection
         slot="morning"

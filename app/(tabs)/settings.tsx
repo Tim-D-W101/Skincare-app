@@ -2,12 +2,13 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 
+import { RemindersSection } from '@/components/settings/RemindersSection';
 import { Button, Card, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { spacing } from '@/theme/tokens';
 
-/** Settings. Only the account section exists so far; the rest arrives with later phases. */
+/** Settings: the account and reminders so far; the rest arrives with later phases. */
 export default function Settings() {
   const email = useAuthStore((state) => state.user?.email);
   const isAnonymous = useAuthStore((state) => state.isAnonymous);
@@ -64,6 +65,8 @@ export default function Settings() {
           </>
         )}
       </Card>
+
+      <RemindersSection />
     </Screen>
   );
 }
